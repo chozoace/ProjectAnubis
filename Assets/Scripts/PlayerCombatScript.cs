@@ -11,7 +11,12 @@ public class PlayerCombatScript : MonoBehaviour
 	    
 	}
 
-    public void DoMove()
+    public void StartAttack()
+    {
+        //looks at list of moves and chooses best match then calls DoMove
+    }
+
+    public void DoMove(GameObject theAttackPrefab)
     {
         //Will this instantiate the prefab? take in a parameter?
     }
