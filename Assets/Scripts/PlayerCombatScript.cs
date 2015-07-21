@@ -5,6 +5,7 @@ using System.Collections.Generic;
 public class PlayerCombatScript : MonoBehaviour 
 {
     [SerializeField] List<GameObject> _openingAttacks;
+    List<Attack> attackQueue;
 
 	void Start () 
     {

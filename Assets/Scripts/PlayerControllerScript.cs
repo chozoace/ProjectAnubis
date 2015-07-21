@@ -7,7 +7,7 @@ public class PlayerControllerScript : MonoBehaviour
     [SerializeField] float _maxSpeed = 30;
     [SerializeField] float _jumpSpeed = 3;
     [SerializeField] Transform _groundCheck;
-    float _groundRadius = .32f;
+    float _groundRadius = .2f;
     [SerializeField] LayerMask _whatIsGround;
     float _currentXSpeed;
 
@@ -27,6 +27,10 @@ public class PlayerControllerScript : MonoBehaviour
     void FixedUpdate()
     {
         _grounded = Physics2D.OverlapCircle(_groundCheck.position, _groundRadius, _whatIsGround);
+        if(_grounded)
+        {
+            
+        }
     }
 
 	void Update () 
@@ -52,9 +56,9 @@ public class PlayerControllerScript : MonoBehaviour
             _facingRight = false;
         //turn player around according to direction
         if (!_facingRight)
-            transform.localScale = new Vector3(-1, transform.localScale.y, transform.localScale.z);
-        else
             transform.localScale = new Vector3(1, transform.localScale.y, transform.localScale.z);
+        else
+            transform.localScale = new Vector3(-1, transform.localScale.y, transform.localScale.z);
 
         //Debug.Log(_facingRight);
 

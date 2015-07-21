@@ -3,17 +3,18 @@ using System.Collections;
 
 public class Attack : MonoBehaviour 
 {
-    float _startUp;
-    float _active;
-    float _recovery;
-    //dash cancel
-    //move cancel
+    [SerializeField] float _startUp;
+    [SerializeField] float _active;
+    [SerializeField] float _recovery;
+    [SerializeField] float _hitboxWidth;
+    [SerializeField] float _hitboxHeight;
+    [SerializeField] float _translationDistance;
+    [SerializeField] float _translationTime;
+    [SerializeField] float _nextMoveListen;
+    [SerializeField] float _nextMoveExecute;
+    [SerializeField] float _movementCancel;
+    [SerializeField] string _animationName;
     //special cancel
-    //next move listen
-    //next move fire
-    //tech move listen
-    //tech move fire
-    //translation active, when during the attack am I being translated
 	
 	void Start () 
     {
