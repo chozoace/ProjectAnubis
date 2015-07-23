@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class Attack : MonoBehaviour 
 {
@@ -14,12 +15,24 @@ public class Attack : MonoBehaviour
     [SerializeField] float _nextMoveExecute;
     [SerializeField] float _movementCancel;
     [SerializeField] string _animationName;
+    [SerializeField] int _priority;
+    int _currentFrame;
+
+    [SerializeField] List<Attack> _linkerList;
+
+    enum State{ Idle, Walking, Airbourne };
+    [SerializeField] State _requiredState = State.Idle;
     //special cancel
 	
 	void Start () 
     {
 	    //Start timer here
 	}
+
+    public bool ConditionsMet(FighterState theFighter)
+    {
+        return false;
+    }
 	
 	void Update () 
     {

@@ -224,6 +224,7 @@
      <Compile Include="Assets\InControl\Source\XInput\XInputDotNetPure\GamePad.cs" />
      <Compile Include="Assets\InControl\Test\TestInputManager.cs" />
      <Compile Include="Assets\Scripts\Attack.cs" />
+     <Compile Include="Assets\Scripts\FighterState.cs" />
      <Compile Include="Assets\Scripts\PlayerCombatScript.cs" />
      <Compile Include="Assets\Scripts\PlayerControllerScript.cs" />
      <None Include="Assets\InControl\Readme\README.txt" />

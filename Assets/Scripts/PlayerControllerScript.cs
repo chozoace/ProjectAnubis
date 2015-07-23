@@ -2,7 +2,7 @@
 using System.Collections;
 using InControl;
 
-public class PlayerControllerScript : MonoBehaviour 
+public class PlayerControllerScript : FighterState
 {
     [SerializeField] float _maxSpeed = 30;
     [SerializeField] float _jumpSpeed = 3;
@@ -11,8 +11,6 @@ public class PlayerControllerScript : MonoBehaviour
     [SerializeField] LayerMask _whatIsGround;
     float _currentXSpeed;
 
-    bool _grounded = false;
-    bool _attacking = false;
     bool _facingRight = true;
 
     Animator anim;
@@ -27,15 +25,13 @@ public class PlayerControllerScript : MonoBehaviour
     void FixedUpdate()
     {
         _grounded = Physics2D.OverlapCircle(_groundCheck.position, _groundRadius, _whatIsGround);
-        if(_grounded)
-        {
-            
-        }
     }
 
 	void Update () 
     {
         var inputDevice = InputManager.ActiveDevice;
+        _xDirection = inputDevice.LeftStickX.Value;
+        _yDirection = inputDevice.LeftStickY.Value;
 
         //X Movement
         _currentXSpeed = (_maxSpeed * inputDevice.LeftStickX.Value);
@@ -60,12 +56,11 @@ public class PlayerControllerScript : MonoBehaviour
         else
             transform.localScale = new Vector3(-1, transform.localScale.y, transform.localScale.z);
 
-        //Debug.Log(_facingRight);
-
         if(inputDevice.Action1.WasPressed && _grounded)
         {
             Jump();
         }
+        //Also check if listening for inputs
         else if(inputDevice.Action3.WasPressed && _grounded)
         {
             //What will do move do? 
