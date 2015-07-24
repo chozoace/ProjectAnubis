@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 public class Attack : MonoBehaviour 
 {
+    [SerializeField] string _attackName = "Default";
     [SerializeField] float _startUp;
     [SerializeField] float _active;
     [SerializeField] float _recovery;
@@ -22,18 +23,29 @@ public class Attack : MonoBehaviour
 
     enum State{ Idle, Walking, Airbourne };
     [SerializeField] State _requiredState = State.Idle;
+    FighterState _fighterRef;
+    PlayerCombatScript _combatScript;
     //special cancel
 	
 	void Start () 
     {
-	    //Start timer here
+	    
 	}
+
+    public void Execute(FighterState fighterRef, PlayerCombatScript combatScript)
+    {
+        //Start timer here
+        Debug.Log("Attack Execute: " + _attackName);
+        _fighterRef = fighterRef;
+        _combatScript = combatScript;
+        _combatScript.AttackFinsihed();
+    }
 
     public bool ConditionsMet(FighterState theFighter)
     {
-        return false;
+        return true;
     }
-	
+
 	void Update () 
     {
 	    //after _startupTime amount of time has passed, activate move hitbox

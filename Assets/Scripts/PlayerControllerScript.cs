@@ -38,7 +38,7 @@ public class PlayerControllerScript : FighterState
         Vector2 v = gameObject.GetComponent<Rigidbody2D>().velocity;
         v.x = _currentXSpeed;
 
-        Debug.Log(gameObject.GetComponent<Rigidbody2D>().velocity.x);
+        //Debug.Log(gameObject.GetComponent<Rigidbody2D>().velocity.x);
 
         anim.SetFloat("XSpeed", Mathf.Abs(_currentXSpeed));
         anim.SetFloat("YSpeed", v.y);

@@ -4,7 +4,7 @@ using System.Collections;
 public class FighterState : MonoBehaviour 
 {
     protected bool _attacking = false;
-    public bool Attacking { get { return _attacking; } }
+    public bool Attacking { get { return _attacking; } set { _attacking = value; } }
     protected bool _grounded = false;
     public bool Grounded { get { return _grounded; } }
     protected float _xDirection;
@@ -14,7 +14,7 @@ public class FighterState : MonoBehaviour
     {
 	
 	}
-	
+
 	void Update () 
     {
 	

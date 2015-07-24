@@ -11,7 +11,7 @@ public class PlayerCombatScript : MonoBehaviour
 
 	void Start () 
     {
-	    
+        _attackQueue = new List<Attack>();
 	}
 
     void FixedUpdate()
@@ -23,21 +23,32 @@ public class PlayerCombatScript : MonoBehaviour
         }
         else
         {
+            if (_attackQueue.Count > 0)
+            {
+                Debug.Log("Choosing attack from attack queue");
+                _currentAttack = _attackQueue[0];
+                _attackQueue.RemoveAt(0);
 
+                Debug.Log("setting true");
+                gameObject.GetComponent<FighterState>().Attacking = true;
+                _currentAttack.Execute(gameObject.GetComponent<FighterState>(), this);
+            }
         }
     }
 
     public void StartAttack()
     {
+        Debug.Log("In StartAttack");
         Attack performingAttack = null;
         //attacking, check attack's list of chains
         if (gameObject.GetComponent<FighterState>().Attacking)
         {
-
+            Debug.Log("checking list of chains");
         }
         //Not attacking so check list of opening attacks and chose best match
         else
         {
+            Debug.Log("checking list of opening");
             foreach (Attack theAttack in _openingAttacks)
             {
                 if(theAttack.ConditionsMet(gameObject.GetComponent<FighterState>()))
@@ -51,6 +62,14 @@ public class PlayerCombatScript : MonoBehaviour
         {
             _attackQueue.Add(performingAttack);
         }
+        Debug.Log("attackQueue length: " + _attackQueue.Count);
+    }
+
+    public void AttackFinsihed()
+    {
+        gameObject.GetComponent<FighterState>().Attacking = false;
+        _currentAttack = null;
+        Debug.Log("Attack End: ");
     }
 
     public void DoMove(Attack theAttack)
