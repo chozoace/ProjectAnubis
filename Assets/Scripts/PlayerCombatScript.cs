@@ -7,15 +7,21 @@ public class PlayerCombatScript : MonoBehaviour
     [SerializeField] List<Attack> _openingAttacks;
     List<Attack> _attackQueue;
     Attack _currentAttack;
+    Attack _attackPrefab;
     bool _readyToExecute = true;
 
 	void Start () 
     {
+        Debug.Log("combat script start");
         _attackQueue = new List<Attack>();
 	}
 
     void FixedUpdate()
     {
+        if(_currentAttack != null)
+        {
+            //_currentAttack.FixedUpdate();
+        }
         //Executes attack from list when ready to fire
         if(gameObject.GetComponent<FighterState>().Attacking)
         {
@@ -31,7 +37,8 @@ public class PlayerCombatScript : MonoBehaviour
 
                 Debug.Log("setting true");
                 gameObject.GetComponent<FighterState>().Attacking = true;
-                _currentAttack.Execute(gameObject.GetComponent<FighterState>(), this);
+                _attackPrefab = (Attack)Instantiate(_currentAttack, PlayerControllerScript.Instance().transform.position, Quaternion.identity);
+                _attackPrefab.Execute(gameObject.GetComponent<FighterState>(), this);
             }
         }
     }
@@ -44,6 +51,8 @@ public class PlayerCombatScript : MonoBehaviour
         if (gameObject.GetComponent<FighterState>().Attacking)
         {
             Debug.Log("checking list of chains");
+            //check current attacks canFire attribute
+
         }
         //Not attacking so check list of opening attacks and chose best match
         else
@@ -67,8 +76,11 @@ public class PlayerCombatScript : MonoBehaviour
 
     public void AttackFinsihed()
     {
-        gameObject.GetComponent<FighterState>().Attacking = false;
+        PlayerControllerScript pc = gameObject.GetComponent<PlayerControllerScript>();
+        pc.Attacking = false;
+        pc.activateAnimator();
         _currentAttack = null;
+        _attackPrefab = null;
         Debug.Log("Attack End: ");
     }
 
@@ -79,6 +91,9 @@ public class PlayerCombatScript : MonoBehaviour
 
 	void Update () 
     {
-	    
+	    if(_currentAttack != null)
+        {
+            //_currentAttack.Update();
+        }
 	}
 }

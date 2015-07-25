@@ -12,14 +12,22 @@ public class PlayerControllerScript : FighterState
     float _currentXSpeed;
 
     bool _facingRight = true;
+    public bool FacingRight { get { return _facingRight; } }
 
     Animator anim;
     int jumpHash = Animator.StringToHash("Jump");
-    
+    static PlayerControllerScript _instance;
+
+    public static PlayerControllerScript Instance()
+    {
+        return _instance;
+    }
+
 	void Start () 
     {
 	    //Testing
         anim = GetComponent<Animator>();
+        _instance = this;
 	}
 
     void FixedUpdate()
@@ -68,6 +76,18 @@ public class PlayerControllerScript : FighterState
         }
 
 	}
+
+    public void disableAnimator()
+    {
+        anim.enabled = false;
+        gameObject.GetComponent<SpriteRenderer>().enabled = false;
+    }
+
+    public void activateAnimator()
+    {
+        anim.enabled = true;
+        gameObject.GetComponent<SpriteRenderer>().enabled = true;
+    }
 
     void Jump()
     {
