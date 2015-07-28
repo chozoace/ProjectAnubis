@@ -38,44 +38,58 @@ public class PlayerControllerScript : FighterState
 	void Update () 
     {
         var inputDevice = InputManager.ActiveDevice;
-        _xDirection = inputDevice.LeftStickX.Value;
-        _yDirection = inputDevice.LeftStickY.Value;
-
-        //X Movement
-        _currentXSpeed = (_maxSpeed * inputDevice.LeftStickX.Value);
-        Vector2 v = gameObject.GetComponent<Rigidbody2D>().velocity;
-        v.x = _currentXSpeed;
-
-        //Debug.Log(gameObject.GetComponent<Rigidbody2D>().velocity.x);
-
-        anim.SetFloat("XSpeed", Mathf.Abs(_currentXSpeed));
-        anim.SetFloat("YSpeed", v.y);
-        anim.SetBool("Grounded", _grounded);
-
-        gameObject.GetComponent<Rigidbody2D>().velocity = v;
-        //Update facing var
-        if (inputDevice.LeftStickX.Value > 0)
-            _facingRight = true;
-        else if(inputDevice.LeftStickX.Value < 0)
-            _facingRight = false;
-        //turn player around according to direction
-        if (!_facingRight)
-            transform.localScale = new Vector3(1, transform.localScale.y, transform.localScale.z);
-        else
-            transform.localScale = new Vector3(-1, transform.localScale.y, transform.localScale.z);
-
-        if(inputDevice.Action1.WasPressed && _grounded)
+        if (!_attacking)
         {
-            Jump();
+            //WHY DOES THIS GET ACCESSED DURING ATTACKS SOMETIMES?? IT MOVES ME FORWARD
+            _xDirection = inputDevice.LeftStickX.Value;
+            _yDirection = inputDevice.LeftStickY.Value;
+
+            //X Movement
+            _currentXSpeed = (_maxSpeed * inputDevice.LeftStickX.Value);
+            Vector2 v = gameObject.GetComponent<Rigidbody2D>().velocity;
+            v.x = _currentXSpeed;
+
+            //Debug.Log(gameObject.GetComponent<Rigidbody2D>().velocity.x);
+
+            anim.SetFloat("XSpeed", Mathf.Abs(_currentXSpeed));
+            anim.SetFloat("YSpeed", v.y);
+            anim.SetBool("Grounded", _grounded);
+
+            gameObject.GetComponent<Rigidbody2D>().velocity = v;
+            //Update facing var
+            if (inputDevice.LeftStickX.Value > 0)
+                _facingRight = true;
+            else if (inputDevice.LeftStickX.Value < 0)
+                _facingRight = false;
+            //turn player around according to direction
+            if (!_facingRight)
+                transform.localScale = new Vector3(1, transform.localScale.y, transform.localScale.z);
+            else
+                transform.localScale = new Vector3(-1, transform.localScale.y, transform.localScale.z);
+
+            if (inputDevice.Action1.WasPressed && _grounded)
+            {
+                Jump();
+            }
         }
         //Also check if listening for inputs
-        else if(inputDevice.Action3.WasPressed && _grounded)
+        if (inputDevice.Action3.WasPressed && _grounded)
         {
             //What will do move do? 
+            Debug.Log("position before attack: " + transform.position);
+            StopMovement();
             gameObject.GetComponent<PlayerCombatScript>().StartAttack();
         }
 
 	}
+
+    public void StopMovement()
+    {
+        _currentXSpeed = 0;
+        Vector2 v = gameObject.GetComponent<Rigidbody2D>().velocity;
+        v.x = _currentXSpeed;
+        this.gameObject.GetComponent<Rigidbody2D>().velocity = v;
+    }
 
     public void disableAnimator()
     {

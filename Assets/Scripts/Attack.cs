@@ -13,7 +13,10 @@ public class Attack : MonoBehaviour
     [SerializeField] bool _activeHitbox = false;
     [SerializeField] bool _translate;
     [SerializeField] bool _nextMoveListen;
+    public bool NextMoveListen { get { return _nextMoveListen; } set { _nextMoveListen = value; } }
+    //private bool _nextMoveFlag;
     [SerializeField] bool _nextMoveExecute;
+    public bool NextMoveExecute { get { return _nextMoveExecute; } }
     [SerializeField] bool _movementCancel;
     [SerializeField] bool _moveFinished = false;
     int _currentFrame;
@@ -26,6 +29,8 @@ public class Attack : MonoBehaviour
     PlayerCombatScript _combatScript;
     Animator _anim;
     //special cancel
+
+    bool _linkerCancel = false;
 	
 	void Awake () 
     {
@@ -34,6 +39,25 @@ public class Attack : MonoBehaviour
         this.gameObject.SetActive(false);
         this.gameObject.GetComponent<SpriteRenderer>().enabled = false;
 	}
+
+    public Attack CheckLinkers()
+    {
+        Debug.Log("In check linkers");
+        Attack result = null;
+        foreach(Attack linker in _linkerList)
+        {
+            if(linker.ConditionsMet(_fighterRef))
+            {
+                result = linker;
+            }
+        }
+        if(result != null)
+        {
+            this._linkerCancel = true;
+        }
+        Debug.Log("CHANGED LINKER CANCEL TO: " + _linkerCancel + " of " + _attackName);
+        return result;
+    }
 
     public void Execute(FighterState fighterRef, PlayerCombatScript combatScript)
     {
@@ -52,8 +76,7 @@ public class Attack : MonoBehaviour
 
     public void FixedUpdate()
     {
-        Debug.Log("fixed update");
-        Debug.Log("Move Finished " + _moveFinished);
+        
     }
 
     public bool ConditionsMet(FighterState theFighter)
@@ -63,17 +86,20 @@ public class Attack : MonoBehaviour
 
 	public void Update () 
     {
-        Debug.Log("Update");
-        if (_moveFinished)
+        if (_moveFinished && !_linkerCancel)
         {
-            Debug.Log("attack finsihed");
-            this.gameObject.SetActive(false);
-            this.gameObject.GetComponent<SpriteRenderer>().enabled = false;
-            _combatScript.AttackFinsihed();
+            EndAttack();
         }
-        //NOT NEEDED
-	    //after _startupTime amount of time has passed, activate move hitbox
-        //after _active amount of time has passed, remove move hitbox
-        //after _recovery amount of time has passed, exit attack state
 	}
+
+    public void EndAttack()
+    {
+        Debug.Log("attack finsihed");
+        //this.gameObject.SetActive(false);
+        //this.gameObject.GetComponent<SpriteRenderer>().enabled = false;
+        Debug.Log("LINKER CANCEL: " + _linkerCancel + " of " + _attackName);
+        if(!_linkerCancel)
+            _combatScript.AttackFinsihed();
+        GameObject.Destroy(this.gameObject);
+    }
 }

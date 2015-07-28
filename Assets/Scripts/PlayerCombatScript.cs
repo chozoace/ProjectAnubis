@@ -6,9 +6,10 @@ public class PlayerCombatScript : MonoBehaviour
 {
     [SerializeField] List<Attack> _openingAttacks;
     List<Attack> _attackQueue;
-    Attack _currentAttack;
+    public Attack _currentAttack;
     Attack _attackPrefab;
     bool _readyToExecute = true;
+    bool _moveListened = false;
 
 	void Start () 
     {
@@ -18,14 +19,24 @@ public class PlayerCombatScript : MonoBehaviour
 
     void FixedUpdate()
     {
-        if(_currentAttack != null)
-        {
-            //_currentAttack.FixedUpdate();
-        }
         //Executes attack from list when ready to fire
-        if(gameObject.GetComponent<FighterState>().Attacking)
+        if(gameObject.GetComponent<FighterState>().Attacking && _attackPrefab != null)
         {
             //DO I REALLY NEED AN ATTACKQUEUE OR JUST A REFERENCE FOR THE NEXT ATTACK?
+            //check if move.canfire is true, if so execute move in list
+            if(_attackPrefab.NextMoveExecute && _attackQueue.Count > 0)
+            {
+                _attackPrefab.EndAttack();
+
+                _currentAttack = _attackQueue[0];
+                _attackQueue.RemoveAt(0);
+
+                Debug.Log("PLayer position at time of attack: " + PlayerControllerScript.Instance().transform.position);
+                gameObject.GetComponent<FighterState>().Attacking = true;
+                _attackPrefab = (Attack)Instantiate(_currentAttack, PlayerControllerScript.Instance().transform.position, Quaternion.identity);
+                _attackPrefab.Execute(gameObject.GetComponent<FighterState>(), this);
+                _moveListened = false;
+            }
         }
         else
         {
@@ -39,20 +50,28 @@ public class PlayerCombatScript : MonoBehaviour
                 gameObject.GetComponent<FighterState>().Attacking = true;
                 _attackPrefab = (Attack)Instantiate(_currentAttack, PlayerControllerScript.Instance().transform.position, Quaternion.identity);
                 _attackPrefab.Execute(gameObject.GetComponent<FighterState>(), this);
+                _moveListened = false;
             }
         }
     }
 
     public void StartAttack()
     {
+        this.gameObject.GetComponent<PlayerControllerScript>().StopMovement();
         Debug.Log("In StartAttack");
         Attack performingAttack = null;
         //attacking, check attack's list of chains
-        if (gameObject.GetComponent<FighterState>().Attacking)
+        if (gameObject.GetComponent<FighterState>().Attacking && _attackPrefab != null)
         {
-            Debug.Log("checking list of chains");
-            //check current attacks canFire attribute
-
+            Debug.Log("checking list of chains: " + _attackPrefab.NextMoveListen);
+            //Check if attack is listening, if so, add move to queue
+            if(_attackPrefab.NextMoveListen && !_moveListened)
+            {
+                Debug.Log("checking next move linkers");
+                performingAttack = _attackPrefab.CheckLinkers();
+                _attackPrefab.NextMoveListen = false;
+                _moveListened = true;
+            }
         }
         //Not attacking so check list of opening attacks and chose best match
         else
@@ -71,17 +90,20 @@ public class PlayerCombatScript : MonoBehaviour
         {
             _attackQueue.Add(performingAttack);
         }
+        if(_attackPrefab != null)
+            Debug.Log("nextMoveListen after change :" + _attackPrefab.NextMoveListen);
         Debug.Log("attackQueue length: " + _attackQueue.Count);
     }
 
     public void AttackFinsihed()
     {
+        Debug.Log("Attack End");
         PlayerControllerScript pc = gameObject.GetComponent<PlayerControllerScript>();
-        pc.Attacking = false;
-        pc.activateAnimator();
+        pc.transform.position = _attackPrefab.transform.position;
         _currentAttack = null;
         _attackPrefab = null;
-        Debug.Log("Attack End: ");
+        pc.Attacking = false;
+        pc.activateAnimator();
     }
 
     public void DoMove(Attack theAttack)
