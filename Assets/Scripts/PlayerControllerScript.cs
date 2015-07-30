@@ -14,6 +14,10 @@ public class PlayerControllerScript : FighterState
     bool _facingRight = true;
     public bool FacingRight { get { return _facingRight; } }
 
+    public enum PlayerState { Idle, Airbourne, Walking };
+    public PlayerState _currentState = PlayerState.Idle;
+    public PlayerState GetPlayerState { get { return _currentState; } }
+
     Animator anim;
     int jumpHash = Animator.StringToHash("Jump");
     static PlayerControllerScript _instance;
@@ -40,7 +44,13 @@ public class PlayerControllerScript : FighterState
         var inputDevice = InputManager.ActiveDevice;
         if (!_attacking)
         {
-            //WHY DOES THIS GET ACCESSED DURING ATTACKS SOMETIMES?? IT MOVES ME FORWARD
+            if (!_grounded)
+                _currentState = PlayerState.Airbourne;
+            else if (_grounded && gameObject.GetComponent<Rigidbody2D>().velocity.x == 0)
+                _currentState = PlayerState.Idle;
+            else
+                _currentState = PlayerState.Walking;
+
             _xDirection = inputDevice.LeftStickX.Value;
             _yDirection = inputDevice.LeftStickY.Value;
 
@@ -73,9 +83,10 @@ public class PlayerControllerScript : FighterState
             }
         }
         //Also check if listening for inputs
-        if (inputDevice.Action3.WasPressed && _grounded)
+        if (inputDevice.Action3.WasPressed)
         {
             //What will do move do? 
+            //CHECK FOR JUMP HEIGHT, ONLY TRIGGER AT MID-HIGH HEIGHT
             Debug.Log("position before attack: " + transform.position);
             StopMovement();
             gameObject.GetComponent<PlayerCombatScript>().StartAttack();
@@ -88,6 +99,7 @@ public class PlayerControllerScript : FighterState
         _currentXSpeed = 0;
         Vector2 v = gameObject.GetComponent<Rigidbody2D>().velocity;
         v.x = _currentXSpeed;
+        v.y = 0;
         this.gameObject.GetComponent<Rigidbody2D>().velocity = v;
     }
 

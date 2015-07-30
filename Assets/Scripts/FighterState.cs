@@ -12,7 +12,7 @@ public class FighterState : MonoBehaviour
 
 	void Start () 
     {
-	
+	    
 	}
 
 	void Update () 

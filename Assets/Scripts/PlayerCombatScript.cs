@@ -6,7 +6,7 @@ public class PlayerCombatScript : MonoBehaviour
 {
     [SerializeField] List<Attack> _openingAttacks;
     List<Attack> _attackQueue;
-    public Attack _currentAttack;
+    [HideInInspector]public Attack _currentAttack;
     Attack _attackPrefab;
     bool _readyToExecute = true;
     bool _moveListened = false;
@@ -32,9 +32,9 @@ public class PlayerCombatScript : MonoBehaviour
                 _attackQueue.RemoveAt(0);
 
                 Debug.Log("PLayer position at time of attack: " + PlayerControllerScript.Instance().transform.position);
-                gameObject.GetComponent<FighterState>().Attacking = true;
+                //gameObject.GetComponent<FighterState>().Attacking = true;
                 _attackPrefab = (Attack)Instantiate(_currentAttack, PlayerControllerScript.Instance().transform.position, Quaternion.identity);
-                _attackPrefab.Execute(gameObject.GetComponent<FighterState>(), this);
+                _attackPrefab.Execute(gameObject.GetComponent<PlayerControllerScript>(), this);
                 _moveListened = false;
             }
         }
@@ -47,9 +47,9 @@ public class PlayerCombatScript : MonoBehaviour
                 _attackQueue.RemoveAt(0);
 
                 Debug.Log("setting true");
-                gameObject.GetComponent<FighterState>().Attacking = true;
+                //gameObject.GetComponent<FighterState>().Attacking = true;
                 _attackPrefab = (Attack)Instantiate(_currentAttack, PlayerControllerScript.Instance().transform.position, Quaternion.identity);
-                _attackPrefab.Execute(gameObject.GetComponent<FighterState>(), this);
+                _attackPrefab.Execute(gameObject.GetComponent<PlayerControllerScript>(), this);
                 _moveListened = false;
             }
         }
@@ -79,7 +79,7 @@ public class PlayerCombatScript : MonoBehaviour
             Debug.Log("checking list of opening");
             foreach (Attack theAttack in _openingAttacks)
             {
-                if(theAttack.ConditionsMet(gameObject.GetComponent<FighterState>()))
+                if(theAttack.ConditionsMet(gameObject.GetComponent<PlayerControllerScript>()))
                 {
                     performingAttack = theAttack;
                 }
@@ -89,6 +89,7 @@ public class PlayerCombatScript : MonoBehaviour
         if(performingAttack != null)
         {
             _attackQueue.Add(performingAttack);
+            gameObject.GetComponent<FighterState>().Attacking = true;
         }
         if(_attackPrefab != null)
             Debug.Log("nextMoveListen after change :" + _attackPrefab.NextMoveListen);
@@ -99,6 +100,7 @@ public class PlayerCombatScript : MonoBehaviour
     {
         Debug.Log("Attack End");
         PlayerControllerScript pc = gameObject.GetComponent<PlayerControllerScript>();
+        pc.GetComponent<Rigidbody2D>().gravityScale = 2;
         pc.transform.position = _attackPrefab.transform.position;
         _currentAttack = null;
         _attackPrefab = null;

@@ -19,13 +19,13 @@ public class Attack : MonoBehaviour
     public bool NextMoveExecute { get { return _nextMoveExecute; } }
     [SerializeField] bool _movementCancel;
     [SerializeField] bool _moveFinished = false;
+    [SerializeField] bool _airAttack;
     int _currentFrame;
 
     [SerializeField] List<Attack> _linkerList;
 
-    enum State{ Idle, Walking, Airbourne };
-    [SerializeField] State _requiredState = State.Idle;
-    FighterState _fighterRef;
+    [SerializeField] List<string> _acceptedStates;
+    PlayerControllerScript _fighterRef;
     PlayerCombatScript _combatScript;
     Animator _anim;
     //special cancel
@@ -59,9 +59,12 @@ public class Attack : MonoBehaviour
         return result;
     }
 
-    public void Execute(FighterState fighterRef, PlayerCombatScript combatScript)
+    public void Execute(PlayerControllerScript fighterRef, PlayerCombatScript combatScript)
     {
         PlayerControllerScript.Instance().disableAnimator();
+        if (_airAttack)
+            PlayerControllerScript.Instance().GetComponent<Rigidbody2D>().gravityScale = 0;
+
         if (!PlayerControllerScript.Instance().FacingRight)
             transform.localScale = new Vector3(1, transform.localScale.y, transform.localScale.z);
         else
@@ -79,9 +82,17 @@ public class Attack : MonoBehaviour
         
     }
 
-    public bool ConditionsMet(FighterState theFighter)
+    public bool ConditionsMet(PlayerControllerScript theFighter)
     {
-        return true;
+        string currentState = theFighter._currentState.ToString();
+
+        foreach(string acceptedState in _acceptedStates)
+        {
+            if (currentState == acceptedState)
+                return true;
+        }
+
+        return false;
     }
 
 	public void Update () 
