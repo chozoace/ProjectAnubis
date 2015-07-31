@@ -6,53 +6,53 @@ public class PlayerCombatScript : MonoBehaviour
 {
     [SerializeField] List<Attack> _openingAttacks;
     List<Attack> _attackQueue;
-    [HideInInspector]public Attack _currentAttack;
+    //Used to instantiate attack
     Attack _attackPrefab;
-    bool _readyToExecute = true;
+    //the instance of the attack
+    Attack _currentAttack;
+    Fighter _fighterRef;
+
     bool _moveListened = false;
 
 	void Start () 
     {
         Debug.Log("combat script start");
         _attackQueue = new List<Attack>();
+        _fighterRef = this.gameObject.GetComponent<Fighter>();
 	}
 
     void FixedUpdate()
     {
         //Executes attack from list when ready to fire
-        if(gameObject.GetComponent<FighterState>().Attacking && _attackPrefab != null)
+        //If attacking
+        if(gameObject.GetComponent<Fighter>().Attacking && _currentAttack != null)
         {
-            //DO I REALLY NEED AN ATTACKQUEUE OR JUST A REFERENCE FOR THE NEXT ATTACK?
             //check if move.canfire is true, if so execute move in list
-            if(_attackPrefab.NextMoveExecute && _attackQueue.Count > 0)
+            if(_currentAttack.NextMoveExecute && _attackQueue.Count > 0)
             {
-                _attackPrefab.EndAttack();
-
-                _currentAttack = _attackQueue[0];
-                _attackQueue.RemoveAt(0);
-
-                Debug.Log("PLayer position at time of attack: " + PlayerControllerScript.Instance().transform.position);
-                //gameObject.GetComponent<FighterState>().Attacking = true;
-                _attackPrefab = (Attack)Instantiate(_currentAttack, PlayerControllerScript.Instance().transform.position, Quaternion.identity);
-                _attackPrefab.Execute(gameObject.GetComponent<PlayerControllerScript>(), this);
-                _moveListened = false;
+                _currentAttack.EndAttack();
+                ExecuteAttack();
             }
         }
         else
         {
             if (_attackQueue.Count > 0)
             {
-                Debug.Log("Choosing attack from attack queue");
-                _currentAttack = _attackQueue[0];
-                _attackQueue.RemoveAt(0);
-
-                Debug.Log("setting true");
-                //gameObject.GetComponent<FighterState>().Attacking = true;
-                _attackPrefab = (Attack)Instantiate(_currentAttack, PlayerControllerScript.Instance().transform.position, Quaternion.identity);
-                _attackPrefab.Execute(gameObject.GetComponent<PlayerControllerScript>(), this);
-                _moveListened = false;
+                ExecuteAttack();
             }
         }
+    }
+
+    void ExecuteAttack()
+    {
+        //Chooses attack from queue and executes it
+        Debug.Log("Choosing attack from attack queue");
+        _attackPrefab = _attackQueue[0];
+        _attackQueue.RemoveAt(0);
+
+        _currentAttack = (Attack)Instantiate(_attackPrefab, this.gameObject.transform.position, Quaternion.identity);
+        _currentAttack.Execute(_fighterRef, this);
+        _moveListened = false;
     }
 
     public void StartAttack()
@@ -61,15 +61,15 @@ public class PlayerCombatScript : MonoBehaviour
         Debug.Log("In StartAttack");
         Attack performingAttack = null;
         //attacking, check attack's list of chains
-        if (gameObject.GetComponent<FighterState>().Attacking && _attackPrefab != null)
+        if (gameObject.GetComponent<Fighter>().Attacking && _currentAttack != null)
         {
-            Debug.Log("checking list of chains: " + _attackPrefab.NextMoveListen);
+            Debug.Log("checking list of chains: " + _currentAttack.NextMoveListen);
             //Check if attack is listening, if so, add move to queue
-            if(_attackPrefab.NextMoveListen && !_moveListened)
+            if(_currentAttack.NextMoveListen && !_moveListened)
             {
                 Debug.Log("checking next move linkers");
-                performingAttack = _attackPrefab.CheckLinkers();
-                _attackPrefab.NextMoveListen = false;
+                performingAttack = _currentAttack.CheckLinkers();
+                _currentAttack.NextMoveListen = false;
                 _moveListened = true;
             }
         }
@@ -79,9 +79,11 @@ public class PlayerCombatScript : MonoBehaviour
             Debug.Log("checking list of opening");
             foreach (Attack theAttack in _openingAttacks)
             {
-                if(theAttack.ConditionsMet(gameObject.GetComponent<PlayerControllerScript>()))
+                if(theAttack.ConditionsMet(_fighterRef))
                 {
                     performingAttack = theAttack;
+                    //break is temporary, if more than one attack meets conditions, choose by priority
+                    break;
                 }
             }
         }
@@ -89,35 +91,26 @@ public class PlayerCombatScript : MonoBehaviour
         if(performingAttack != null)
         {
             _attackQueue.Add(performingAttack);
-            gameObject.GetComponent<FighterState>().Attacking = true;
+            gameObject.GetComponent<Fighter>().Attacking = true;
         }
-        if(_attackPrefab != null)
-            Debug.Log("nextMoveListen after change :" + _attackPrefab.NextMoveListen);
+        if(_currentAttack != null)
+            Debug.Log("nextMoveListen after change :" + _currentAttack.NextMoveListen);
         Debug.Log("attackQueue length: " + _attackQueue.Count);
     }
 
     public void AttackFinsihed()
     {
         Debug.Log("Attack End");
-        PlayerControllerScript pc = gameObject.GetComponent<PlayerControllerScript>();
-        pc.GetComponent<Rigidbody2D>().gravityScale = 2;
-        pc.transform.position = _attackPrefab.transform.position;
-        _currentAttack = null;
+        this.gameObject.GetComponent<Rigidbody2D>().gravityScale = 2;
+        this.gameObject.transform.position = _currentAttack.transform.position;
         _attackPrefab = null;
-        pc.Attacking = false;
-        pc.activateAnimator();
-    }
-
-    public void DoMove(Attack theAttack)
-    {
-        //Will this instantiate the prefab? take in a parameter?
+        _currentAttack = null;
+        _fighterRef.Attacking = false;
+        _fighterRef.activateAnimator();
     }
 
 	void Update () 
     {
-	    if(_currentAttack != null)
-        {
-            //_currentAttack.Update();
-        }
+        
 	}
 }

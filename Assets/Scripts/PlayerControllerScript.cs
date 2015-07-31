@@ -2,7 +2,7 @@
 using System.Collections;
 using InControl;
 
-public class PlayerControllerScript : FighterState
+public class PlayerControllerScript : MonoBehaviour
 {
     [SerializeField] float _maxSpeed = 30;
     [SerializeField] float _jumpSpeed = 3;
@@ -11,16 +11,11 @@ public class PlayerControllerScript : FighterState
     [SerializeField] LayerMask _whatIsGround;
     float _currentXSpeed;
 
-    bool _facingRight = true;
-    public bool FacingRight { get { return _facingRight; } }
-
-    public enum PlayerState { Idle, Airbourne, Walking };
-    public PlayerState _currentState = PlayerState.Idle;
-    public PlayerState GetPlayerState { get { return _currentState; } }
-
-    Animator anim;
-    int jumpHash = Animator.StringToHash("Jump");
+    Animator _anim;
+    PlayerCombatScript _combatScript;
+    int _jumpHash = Animator.StringToHash("Jump");
     static PlayerControllerScript _instance;
+    Fighter _fighterRef;
 
     public static PlayerControllerScript Instance()
     {
@@ -30,29 +25,25 @@ public class PlayerControllerScript : FighterState
 	void Start () 
     {
 	    //Testing
-        anim = GetComponent<Animator>();
+        _anim = GetComponent<Animator>();
+        _combatScript = GetComponent<PlayerCombatScript>();
+        _fighterRef = this.gameObject.GetComponent<Fighter>();
         _instance = this;
 	}
 
     void FixedUpdate()
     {
-        _grounded = Physics2D.OverlapCircle(_groundCheck.position, _groundRadius, _whatIsGround);
+        _fighterRef.Grounded = Physics2D.OverlapCircle(_groundCheck.position, _groundRadius, _whatIsGround);
     }
 
 	void Update () 
     {
         var inputDevice = InputManager.ActiveDevice;
-        if (!_attacking)
+        if (!_fighterRef.Attacking)
         {
-            if (!_grounded)
-                _currentState = PlayerState.Airbourne;
-            else if (_grounded && gameObject.GetComponent<Rigidbody2D>().velocity.x == 0)
-                _currentState = PlayerState.Idle;
-            else
-                _currentState = PlayerState.Walking;
-
-            _xDirection = inputDevice.LeftStickX.Value;
-            _yDirection = inputDevice.LeftStickY.Value;
+            //What is held direction
+            _fighterRef.XDirection = inputDevice.LeftStickX.Value;
+            _fighterRef.YDirection = inputDevice.LeftStickY.Value;
 
             //X Movement
             _currentXSpeed = (_maxSpeed * inputDevice.LeftStickX.Value);
@@ -61,35 +52,33 @@ public class PlayerControllerScript : FighterState
 
             //Debug.Log(gameObject.GetComponent<Rigidbody2D>().velocity.x);
 
-            anim.SetFloat("XSpeed", Mathf.Abs(_currentXSpeed));
-            anim.SetFloat("YSpeed", v.y);
-            anim.SetBool("Grounded", _grounded);
+            _anim.SetFloat("XSpeed", Mathf.Abs(_currentXSpeed));
+            _anim.SetFloat("YSpeed", v.y);
+            _anim.SetBool("Grounded", _fighterRef.Grounded);
 
             gameObject.GetComponent<Rigidbody2D>().velocity = v;
+
             //Update facing var
             if (inputDevice.LeftStickX.Value > 0)
-                _facingRight = true;
+                _fighterRef.FacingRight = true;
             else if (inputDevice.LeftStickX.Value < 0)
-                _facingRight = false;
+                _fighterRef.FacingRight = false;
+
             //turn player around according to direction
-            if (!_facingRight)
+            if (!_fighterRef.FacingRight)
                 transform.localScale = new Vector3(1, transform.localScale.y, transform.localScale.z);
             else
                 transform.localScale = new Vector3(-1, transform.localScale.y, transform.localScale.z);
 
-            if (inputDevice.Action1.WasPressed && _grounded)
-            {
+            if (inputDevice.Action1.WasPressed && _fighterRef.Grounded)
                 Jump();
-            }
         }
-        //Also check if listening for inputs
         if (inputDevice.Action3.WasPressed)
         {
-            //What will do move do? 
-            //CHECK FOR JUMP HEIGHT, ONLY TRIGGER AT MID-HIGH HEIGHT
+            //CHECK FOR JUMP HEIGHT, ONLY TRIGGER AT MID-HIGH HEIGHT(when speed is 0 or greater)
             Debug.Log("position before attack: " + transform.position);
             StopMovement();
-            gameObject.GetComponent<PlayerCombatScript>().StartAttack();
+            _combatScript.StartAttack();
         }
 
 	}
@@ -103,21 +92,9 @@ public class PlayerControllerScript : FighterState
         this.gameObject.GetComponent<Rigidbody2D>().velocity = v;
     }
 
-    public void disableAnimator()
-    {
-        anim.enabled = false;
-        gameObject.GetComponent<SpriteRenderer>().enabled = false;
-    }
-
-    public void activateAnimator()
-    {
-        anim.enabled = true;
-        gameObject.GetComponent<SpriteRenderer>().enabled = true;
-    }
-
     void Jump()
     {
-        anim.SetTrigger(jumpHash);
+        _anim.SetTrigger(_jumpHash);
         Vector2 v = gameObject.GetComponent<Rigidbody2D>().velocity;
         v.y = _jumpSpeed;
         gameObject.GetComponent<Rigidbody2D>().velocity = v;

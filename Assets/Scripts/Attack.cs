@@ -14,21 +14,18 @@ public class Attack : MonoBehaviour
     [SerializeField] bool _translate;
     [SerializeField] bool _nextMoveListen;
     public bool NextMoveListen { get { return _nextMoveListen; } set { _nextMoveListen = value; } }
-    //private bool _nextMoveFlag;
     [SerializeField] bool _nextMoveExecute;
     public bool NextMoveExecute { get { return _nextMoveExecute; } }
     [SerializeField] bool _movementCancel;
     [SerializeField] bool _moveFinished = false;
     [SerializeField] bool _airAttack;
-    int _currentFrame;
 
     [SerializeField] List<Attack> _linkerList;
 
     [SerializeField] List<string> _acceptedStates;
-    PlayerControllerScript _fighterRef;
+    Fighter _fighterRef;
     PlayerCombatScript _combatScript;
     Animator _anim;
-    //special cancel
 
     bool _linkerCancel = false;
 	
@@ -59,13 +56,19 @@ public class Attack : MonoBehaviour
         return result;
     }
 
-    public void Execute(PlayerControllerScript fighterRef, PlayerCombatScript combatScript)
+    public void Execute(Fighter fighterRef, PlayerCombatScript combatScript)
     {
-        PlayerControllerScript.Instance().disableAnimator();
-        if (_airAttack)
-            PlayerControllerScript.Instance().GetComponent<Rigidbody2D>().gravityScale = 0;
+        _fighterRef = fighterRef;
+        _fighterRef.disableAnimator();
 
-        if (!PlayerControllerScript.Instance().FacingRight)
+        if (_airAttack)
+        {
+            //If air attack, dont stop momentum, but pause it on hit.
+            //Create on hit function
+            _fighterRef.GetComponent<Rigidbody2D>().gravityScale = 0;
+        }
+
+        if (!_fighterRef.FacingRight)
             transform.localScale = new Vector3(1, transform.localScale.y, transform.localScale.z);
         else
             transform.localScale = new Vector3(-1, transform.localScale.y, transform.localScale.z);
@@ -77,14 +80,9 @@ public class Attack : MonoBehaviour
         _combatScript = combatScript;
     }
 
-    public void FixedUpdate()
+    public bool ConditionsMet(Fighter theFighter)
     {
-        
-    }
-
-    public bool ConditionsMet(PlayerControllerScript theFighter)
-    {
-        string currentState = theFighter._currentState.ToString();
+        string currentState = theFighter.GetPlayerState.ToString();
 
         foreach(string acceptedState in _acceptedStates)
         {
@@ -106,8 +104,6 @@ public class Attack : MonoBehaviour
     public void EndAttack()
     {
         Debug.Log("attack finsihed");
-        //this.gameObject.SetActive(false);
-        //this.gameObject.GetComponent<SpriteRenderer>().enabled = false;
         Debug.Log("LINKER CANCEL: " + _linkerCancel + " of " + _attackName);
         if(!_linkerCancel)
             _combatScript.AttackFinsihed();
