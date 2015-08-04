@@ -66,6 +66,8 @@ public class Attack : MonoBehaviour
             //If air attack, dont stop momentum, but pause it on hit.
             //Create on hit function
             _fighterRef.GetComponent<Rigidbody2D>().gravityScale = 0;
+            //this.gameObject.GetComponent<Rigidbody2D>().gravityScale = _fighterRef.GetComponent<Rigidbody2D>().gravityScale;
+            //this.gameObject.GetComponent<Rigidbody2D>().velocity = _fighterRef.GetComponent<Rigidbody2D>().velocity;
         }
 
         if (!_fighterRef.FacingRight)

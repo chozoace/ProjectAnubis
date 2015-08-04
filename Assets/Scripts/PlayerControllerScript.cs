@@ -24,7 +24,6 @@ public class PlayerControllerScript : MonoBehaviour
 
 	void Start () 
     {
-	    //Testing
         _anim = GetComponent<Animator>();
         _combatScript = GetComponent<PlayerCombatScript>();
         _fighterRef = this.gameObject.GetComponent<Fighter>();
@@ -49,8 +48,6 @@ public class PlayerControllerScript : MonoBehaviour
             _currentXSpeed = (_maxSpeed * inputDevice.LeftStickX.Value);
             Vector2 v = gameObject.GetComponent<Rigidbody2D>().velocity;
             v.x = _currentXSpeed;
-
-            //Debug.Log(gameObject.GetComponent<Rigidbody2D>().velocity.x);
 
             _anim.SetFloat("XSpeed", Mathf.Abs(_currentXSpeed));
             _anim.SetFloat("YSpeed", v.y);
@@ -77,7 +74,7 @@ public class PlayerControllerScript : MonoBehaviour
         {
             //CHECK FOR JUMP HEIGHT, ONLY TRIGGER AT MID-HIGH HEIGHT(when speed is 0 or greater)
             Debug.Log("position before attack: " + transform.position);
-            StopMovement();
+            //StopMovement();
             _combatScript.StartAttack();
         }
 
