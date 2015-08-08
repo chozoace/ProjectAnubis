@@ -5,7 +5,7 @@ using System.Collections.Generic;
 public class PlayerCombatScript : MonoBehaviour 
 {
     [SerializeField] List<Attack> _openingAttacks;
-    List<Attack> _attackQueue;
+    List<Move> _moveQueue;
     //Used to instantiate attack
     Attack _attackPrefab;
     //the instance of the attack
@@ -17,7 +17,7 @@ public class PlayerCombatScript : MonoBehaviour
 	void Start () 
     {
         Debug.Log("combat script start");
-        _attackQueue = new List<Attack>();
+        _moveQueue = new List<Move>();
         _fighterRef = this.gameObject.GetComponent<Fighter>();
 	}
 
@@ -28,31 +28,55 @@ public class PlayerCombatScript : MonoBehaviour
         if(gameObject.GetComponent<Fighter>().Attacking && _currentAttack != null)
         {
             //check if move.canfire is true, if so execute move in list
-            if(_currentAttack.NextMoveExecute && _attackQueue.Count > 0)
+            if(_moveQueue.Count > 0 && _currentAttack.NextMoveExecute)
             {
                 _currentAttack.EndAttack();
-                ExecuteAttack();
+                ExecuteMove(_moveQueue[0]);
             }
+            /*foreach (Move move in _moveQueue)
+            {
+                if ((move.IsAttack && _currentAttack.NextMoveExecute) ||
+                    (move.IsJump && _currentAttack.CanJumpCancel))
+                {
+                    _currentAttack.EndAttack();
+                    ExecuteMove(move);
+                }
+            }*/
+
         }
         else
         {
-            if (_attackQueue.Count > 0)
+            if (_moveQueue.Count > 0)
             {
-                ExecuteAttack();
+                ExecuteMove(_moveQueue[0]);
             }
         }
     }
 
-    void ExecuteAttack()
+    void ExecuteMove(Move move)
     {
         //Chooses attack from queue and executes it
         //Debug.Log("Choosing attack from attack queue");
-        _attackPrefab = _attackQueue[0];
-        _attackQueue.RemoveAt(0);
+        //Try and have this go through the list until it finds
+        //a viable attack, any non viable attacks are thrown away
+        if (_moveQueue[0].IsAttack)
+        {
+            _attackPrefab = (Attack)_moveQueue[0];
+            _moveQueue.RemoveAt(0);
 
-        _currentAttack = (Attack)Instantiate(_attackPrefab, this.gameObject.transform.position, Quaternion.identity);
-        _currentAttack.Execute(_fighterRef, this);
-        _moveListened = false;
+            _currentAttack = (Attack)Instantiate(_attackPrefab, this.gameObject.transform.position, Quaternion.identity);
+            _currentAttack.Execute(_fighterRef, this);
+            _moveListened = false;
+        }
+        else
+        {
+
+        }
+    }
+
+    public void AddMove(Move theMove)
+    {
+
     }
 
     public void StartAttack()
@@ -90,12 +114,12 @@ public class PlayerCombatScript : MonoBehaviour
 
         if(performingAttack != null)
         {
-            _attackQueue.Add(performingAttack);
+            _moveQueue.Add(performingAttack);
             gameObject.GetComponent<Fighter>().Attacking = true;
         }
         //if(_currentAttack != null)
             //Debug.Log("nextMoveListen after change :" + _currentAttack.NextMoveListen);
-        //Debug.Log("attackQueue length: " + _attackQueue.Count);
+        //Debug.Log("attackQueue length: " + _moveQueue.Count);
     }
 
     public void AttackFinsihed()

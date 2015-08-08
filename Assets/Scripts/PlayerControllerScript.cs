@@ -58,9 +58,6 @@ public class PlayerControllerScript : MonoBehaviour
                 transform.localScale = new Vector3(1, transform.localScale.y, transform.localScale.z);
             else
                 transform.localScale = new Vector3(-1, transform.localScale.y, transform.localScale.z);
-
-            if (inputDevice.Action1.WasPressed && _fighterRef.Grounded)
-                Jump();
         }
         if (inputDevice.Action3.WasPressed)
         {
@@ -69,6 +66,8 @@ public class PlayerControllerScript : MonoBehaviour
             //StopMovement();
             _combatScript.StartAttack();
         }
+        if (inputDevice.Action1.WasPressed && _fighterRef.Grounded)
+            Jump();
 
 	}
 
@@ -83,9 +82,16 @@ public class PlayerControllerScript : MonoBehaviour
 
     void Jump()
     {
-        _anim.SetTrigger(_jumpHash);
-        Vector2 v = gameObject.GetComponent<Rigidbody2D>().velocity;
-        v.y = _jumpSpeed;
-        gameObject.GetComponent<Rigidbody2D>().velocity = v;
+        if (_fighterRef.Grounded)
+        {
+            _anim.SetTrigger(_jumpHash);
+            Vector2 v = gameObject.GetComponent<Rigidbody2D>().velocity;
+            v.y = _jumpSpeed;
+            gameObject.GetComponent<Rigidbody2D>().velocity = v;
+        }
+        else
+        {
+            
+        }
     }
 }
