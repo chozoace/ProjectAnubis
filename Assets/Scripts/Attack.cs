@@ -20,6 +20,11 @@ public class Attack : MonoBehaviour
     [SerializeField] bool _moveFinished = false;
     [SerializeField] bool _airAttack;
 
+    [SerializeField] int _damage;
+    [SerializeField] float _hitstunTime;
+    [SerializeField] float _xLaunchSpeed;
+    [SerializeField] float _yLaunchSpeed;
+
     [SerializeField] List<Attack> _linkerList;
 
     [SerializeField] List<string> _acceptedStates;
@@ -27,19 +32,21 @@ public class Attack : MonoBehaviour
     PlayerCombatScript _combatScript;
     Animator _anim;
 
+    bool _hitboxCollided;
     bool _linkerCancel = false;
 	
 	void Awake () 
     {
-        Debug.Log("In attack Awake");
+        //Debug.Log("In attack Awake");
         _anim = gameObject.GetComponent<Animator>();
         this.gameObject.SetActive(false);
         this.gameObject.GetComponent<SpriteRenderer>().enabled = false;
+        _hitboxCollided = false;
 	}
 
     public Attack CheckLinkers()
     {
-        Debug.Log("In check linkers");
+        //Debug.Log("In check linkers");
         Attack result = null;
         foreach(Attack linker in _linkerList)
         {
@@ -52,8 +59,32 @@ public class Attack : MonoBehaviour
         {
             this._linkerCancel = true;
         }
-        Debug.Log("CHANGED LINKER CANCEL TO: " + _linkerCancel + " of " + _attackName);
+        //Debug.Log("CHANGED LINKER CANCEL TO: " + _linkerCancel + " of " + _attackName);
         return result;
+    }
+
+    //On collision Enter, Ignores fighterRef's hurtboxes
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        Debug.Log("Is facing right " + _fighterRef.FacingRight);
+        if (!_fighterRef.FacingRight && !_hitboxCollided)
+        {
+            Debug.Log("before launch change " + _xLaunchSpeed);
+            _xLaunchSpeed = (float)(_xLaunchSpeed * -1.0f);
+            Debug.Log("changed launch direction to " + _xLaunchSpeed);
+            _hitboxCollided = true;
+        }
+        Debug.Log("launch speed for " + this.gameObject.name + " is " + _xLaunchSpeed);
+        Debug.Log("collision at: " + other.gameObject.name);
+        if(other.gameObject.GetComponent<Fighter>() != null && other.gameObject.GetComponent<Fighter>() != _fighterRef)
+        {
+            Fighter enemyRef = other.gameObject.GetComponent<Fighter>();
+            Debug.Log(other.gameObject.name + " is a fighter");
+
+            //apply damage, apply hitstun time, apply translation
+            enemyRef.EnterHitstun(_hitstunTime);
+            enemyRef.ApplyAttackForce(new Vector2(_xLaunchSpeed, _yLaunchSpeed));
+        }
     }
 
     public void Execute(Fighter fighterRef, PlayerCombatScript combatScript)
@@ -77,7 +108,7 @@ public class Attack : MonoBehaviour
 
         this.gameObject.SetActive(true);
         this.gameObject.GetComponent<SpriteRenderer>().enabled = true;
-        Debug.Log("Attack Execute: " + _attackName);
+        //Debug.Log("Attack Execute: " + _attackName);
         _fighterRef = fighterRef;
         _combatScript = combatScript;
     }
@@ -105,8 +136,8 @@ public class Attack : MonoBehaviour
 
     public void EndAttack()
     {
-        Debug.Log("attack finsihed");
-        Debug.Log("LINKER CANCEL: " + _linkerCancel + " of " + _attackName);
+        //Debug.Log("attack finsihed");
+        //Debug.Log("LINKER CANCEL: " + _linkerCancel + " of " + _attackName);
         if(!_linkerCancel)
             _combatScript.AttackFinsihed();
         GameObject.Destroy(this.gameObject);

@@ -12,22 +12,45 @@ public class Fighter : MonoBehaviour
     public float XDirection { get { return _xDirection; } set { _xDirection = value; } }
     public float YDirection { get { return _yDirection; } set { _yDirection = value; } }
 
-    public enum PlayerState { Idle, Airbourne, Walking };
+    public enum PlayerState { Idle, Airbourne, Walking, };
     PlayerState _currentState = PlayerState.Idle;
     public PlayerState GetPlayerState { get { return _currentState; } }
+    //no movement or attacks are allowed during hitstunned
+    bool _hitstunned;
+    public bool IsHitstunned { get { return _hitstunned; } }
 
     bool _facingRight = true;
     public bool FacingRight { get { return _facingRight; } set { _facingRight = value; } }
 
     Animator _anim;
+    [SerializeField] Sprite _redSprite;
+    [SerializeField] Sprite _blueSprite;
+
+    [SerializeField] protected Transform _groundCheck;
+    protected float _groundRadius = .2f;
+    [SerializeField] protected LayerMask _whatIsGround;
 
 	void Start () 
     {
         _anim = GetComponent<Animator>();
+        _hitstunned = false;
 	}
+
+    void FixedUpdate()
+    {
+        _grounded = Physics2D.OverlapCircle(_groundCheck.position, _groundRadius, _whatIsGround);
+    }
 
 	void Update () 
     {
+        if(_hitstunned)
+        {
+            gameObject.GetComponent<SpriteRenderer>().sprite = _blueSprite;
+        }
+        else
+        {
+            gameObject.GetComponent<SpriteRenderer>().sprite = _redSprite;
+        }
         if (!Attacking)
         {
             if (!Grounded)
@@ -38,6 +61,32 @@ public class Fighter : MonoBehaviour
                 _currentState = PlayerState.Walking;
         }
 	}
+
+    public void EnterHitstun(float hitstunTime)
+    {
+        StopAllCoroutines();
+        _hitstunned = true;
+
+        Debug.Log("EnteringHitstun");
+        StartCoroutine(ExitHitstun(hitstunTime));
+    }
+
+    public void ApplyAttackForce(Vector2 launchSpeed)
+    {
+        this.gameObject.GetComponent<Rigidbody2D>().velocity = launchSpeed;
+    }
+
+    IEnumerator ExitHitstun(float hitstunTime)
+    {
+        Debug.Log("exitingHitstun");
+        yield return new WaitForSeconds(hitstunTime);
+        Debug.Log("exitingHitstun again");
+        while(!_grounded)
+        {
+            //wait until grounded before ending hitstun
+        }
+        _hitstunned = false;
+    }
 
     public void disableAnimator()
     {

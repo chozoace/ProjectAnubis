@@ -6,9 +6,6 @@ public class PlayerControllerScript : MonoBehaviour
 {
     [SerializeField] float _maxSpeed = 30;
     [SerializeField] float _jumpSpeed = 3;
-    [SerializeField] Transform _groundCheck;
-    float _groundRadius = .2f;
-    [SerializeField] LayerMask _whatIsGround;
     float _currentXSpeed;
 
     Animator _anim;
@@ -29,11 +26,6 @@ public class PlayerControllerScript : MonoBehaviour
         _fighterRef = this.gameObject.GetComponent<Fighter>();
         _instance = this;
 	}
-
-    void FixedUpdate()
-    {
-        _fighterRef.Grounded = Physics2D.OverlapCircle(_groundCheck.position, _groundRadius, _whatIsGround);
-    }
 
 	void Update () 
     {
@@ -73,7 +65,7 @@ public class PlayerControllerScript : MonoBehaviour
         if (inputDevice.Action3.WasPressed)
         {
             //CHECK FOR JUMP HEIGHT, ONLY TRIGGER AT MID-HIGH HEIGHT(when speed is 0 or greater)
-            Debug.Log("position before attack: " + transform.position);
+            //Debug.Log("position before attack: " + transform.position);
             //StopMovement();
             _combatScript.StartAttack();
         }

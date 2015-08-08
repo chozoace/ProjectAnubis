@@ -46,7 +46,7 @@ public class PlayerCombatScript : MonoBehaviour
     void ExecuteAttack()
     {
         //Chooses attack from queue and executes it
-        Debug.Log("Choosing attack from attack queue");
+        //Debug.Log("Choosing attack from attack queue");
         _attackPrefab = _attackQueue[0];
         _attackQueue.RemoveAt(0);
 
@@ -58,16 +58,16 @@ public class PlayerCombatScript : MonoBehaviour
     public void StartAttack()
     {
         this.gameObject.GetComponent<PlayerControllerScript>().StopMovement();
-        Debug.Log("In StartAttack");
+        //Debug.Log("In StartAttack");
         Attack performingAttack = null;
         //attacking, check attack's list of chains
         if (gameObject.GetComponent<Fighter>().Attacking && _currentAttack != null)
         {
-            Debug.Log("checking list of chains: " + _currentAttack.NextMoveListen);
+            //Debug.Log("checking list of chains: " + _currentAttack.NextMoveListen);
             //Check if attack is listening, if so, add move to queue
             if(_currentAttack.NextMoveListen && !_moveListened)
             {
-                Debug.Log("checking next move linkers");
+               //Debug.Log("checking next move linkers");
                 performingAttack = _currentAttack.CheckLinkers();
                 _currentAttack.NextMoveListen = false;
                 _moveListened = true;
@@ -76,7 +76,7 @@ public class PlayerCombatScript : MonoBehaviour
         //Not attacking so check list of opening attacks and chose best match
         else
         {
-            Debug.Log("checking list of opening");
+            //Debug.Log("checking list of opening");
             foreach (Attack theAttack in _openingAttacks)
             {
                 if(theAttack.ConditionsMet(_fighterRef))
@@ -93,14 +93,14 @@ public class PlayerCombatScript : MonoBehaviour
             _attackQueue.Add(performingAttack);
             gameObject.GetComponent<Fighter>().Attacking = true;
         }
-        if(_currentAttack != null)
-            Debug.Log("nextMoveListen after change :" + _currentAttack.NextMoveListen);
-        Debug.Log("attackQueue length: " + _attackQueue.Count);
+        //if(_currentAttack != null)
+            //Debug.Log("nextMoveListen after change :" + _currentAttack.NextMoveListen);
+        //Debug.Log("attackQueue length: " + _attackQueue.Count);
     }
 
     public void AttackFinsihed()
     {
-        Debug.Log("Attack End");
+        //Debug.Log("Attack End");
         this.gameObject.GetComponent<Rigidbody2D>().gravityScale = 2;
         this.gameObject.transform.position = _currentAttack.transform.position;
         _attackPrefab = null;
