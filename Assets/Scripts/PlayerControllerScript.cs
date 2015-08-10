@@ -37,7 +37,18 @@ public class PlayerControllerScript : MonoBehaviour
             _fighterRef.YDirection = inputDevice.LeftStickY.Value;
 
             //X Movement
-            _currentXSpeed = (_maxSpeed * inputDevice.LeftStickX.Value);
+            if (!inputDevice.Name.Equals("None"))
+                _currentXSpeed = (_maxSpeed * inputDevice.LeftStickX.Value);
+            else
+            {
+                if (Input.GetKeyDown(KeyCode.D))
+                    _currentXSpeed = _maxSpeed;
+                else if (Input.GetKeyDown(KeyCode.A))
+                    _currentXSpeed = -_maxSpeed;
+                if (Input.GetKeyUp(KeyCode.D) || Input.GetKeyUp(KeyCode.A))
+                    _currentXSpeed = 0;
+            }
+
             Vector2 v = gameObject.GetComponent<Rigidbody2D>().velocity;
             v.x = _currentXSpeed;
 
@@ -48,10 +59,20 @@ public class PlayerControllerScript : MonoBehaviour
             gameObject.GetComponent<Rigidbody2D>().velocity = v;
 
             //Update facing var
-            if (inputDevice.LeftStickX.Value > 0)
-                _fighterRef.FacingRight = true;
-            else if (inputDevice.LeftStickX.Value < 0)
-                _fighterRef.FacingRight = false;
+            if (!inputDevice.Name.Equals("None"))
+            {
+                if (inputDevice.LeftStickX.Value > 0)
+                    _fighterRef.FacingRight = true;
+                else if (inputDevice.LeftStickX.Value < 0)
+                    _fighterRef.FacingRight = false;
+            }
+            else
+            {
+                if (_currentXSpeed > 0)
+                    _fighterRef.FacingRight = true;
+                else if (_currentXSpeed < 0)
+                    _fighterRef.FacingRight = false;
+            }
 
             //turn player around according to direction
             if (!_fighterRef.FacingRight)
@@ -59,15 +80,25 @@ public class PlayerControllerScript : MonoBehaviour
             else
                 transform.localScale = new Vector3(-1, transform.localScale.y, transform.localScale.z);
         }
-        if (inputDevice.Action3.WasPressed)
+        if (!inputDevice.Name.Equals("None"))
         {
-            //CHECK FOR JUMP HEIGHT, ONLY TRIGGER AT MID-HIGH HEIGHT(when speed is 0 or greater)
-            //Debug.Log("position before attack: " + transform.position);
-            //StopMovement();
-            _combatScript.StartAttack();
+            if (inputDevice.Action3.WasPressed)
+            {
+                //CHECK FOR JUMP HEIGHT, ONLY TRIGGER AT MID-HIGH HEIGHT(when speed is 0 or greater)
+                //Debug.Log("position before attack: " + transform.position);
+                //StopMovement();
+                _combatScript.StartAttack();
+            }
+            if (inputDevice.Action1.WasPressed && _fighterRef.Grounded)
+                Jump();
         }
-        if (inputDevice.Action1.WasPressed && _fighterRef.Grounded)
-            Jump();
+        else
+        {
+            if (Input.GetKeyDown(KeyCode.J))
+                _combatScript.StartAttack();
+            else if (Input.GetKeyDown(KeyCode.Space))
+                Jump();
+        }
 
 	}
 
