@@ -37,9 +37,12 @@ public class Attack : Move
         Attack result = null;
         foreach(Attack linker in _linkerList)
         {
-            if(linker.ConditionsMet(_fighterRef))
+            if (linker != null)
             {
-                result = linker;
+                if (linker.ConditionsMet(_fighterRef))
+                {
+                    result = linker;
+                }
             }
         }
         if(result != null)
@@ -74,6 +77,7 @@ public class Attack : Move
     {
         _fighterRef = fighterRef;
         _fighterRef.disableAnimator();
+        _fighterRef.GetComponent<PlayerControllerScript>().StopMovement();
 
         if (_airAttack)
         {

@@ -11,6 +11,7 @@ public class PlayerCombatScript : MonoBehaviour
     //the instance of the attack
     Attack _currentAttack;
     Fighter _fighterRef;
+    Move _movePrefab;
 
     bool _moveListened = false;
 
@@ -30,8 +31,22 @@ public class PlayerCombatScript : MonoBehaviour
             //check if move.canfire is true, if so execute move in list
             if(_moveQueue.Count > 0 && _currentAttack.NextMoveExecute)
             {
-                _currentAttack.EndAttack();
-                ExecuteMove(_moveQueue[0]);
+                if (_moveQueue[0].IsJump && _currentAttack.CanJumpCancel)
+                {
+                    Debug.Log("Jump entering execution");
+                    _currentAttack.EndAttack();
+                    ExecuteMove(_moveQueue[0]);
+                }
+                else if(_moveQueue[0].IsJump && !_currentAttack.CanJumpCancel)
+                {
+                    _moveQueue.RemoveAt(0);
+                }
+                else if(_moveQueue[0].IsAttack)
+                {
+                    _currentAttack.EndAttack();
+                    ExecuteMove(_moveQueue[0]);
+                }
+                
             }
             /*foreach (Move move in _moveQueue)
             {
@@ -59,6 +74,7 @@ public class PlayerCombatScript : MonoBehaviour
         //Debug.Log("Choosing attack from attack queue");
         //Try and have this go through the list until it finds
         //a viable attack, any non viable attacks are thrown away
+        Debug.Log("in execute move with " + _moveQueue[0].name);
         if (_moveQueue[0].IsAttack)
         {
             _attackPrefab = (Attack)_moveQueue[0];
@@ -68,21 +84,42 @@ public class PlayerCombatScript : MonoBehaviour
             _currentAttack.Execute(_fighterRef, this);
             _moveListened = false;
         }
-        else
+        else if(_moveQueue[0].IsJump)
         {
-
+            Debug.Log("Inside of execute move if statement");
+            _movePrefab = _moveQueue[0];
+            _moveQueue.RemoveAt(0);
+            _movePrefab.Execute(_fighterRef, this);
+            _moveListened = false;
         }
     }
 
-    public void AddMove(Move theMove)
+    public void AddJump(Move theMove)
     {
+        Move performingMove = theMove;
 
+        Debug.Log(performingMove);
+
+        if (gameObject.GetComponent<Fighter>().Attacking && _currentAttack != null)
+        {
+            if(_currentAttack.NextMoveListen && !_moveListened)
+            {
+                Debug.Log("jump cancelled jump");
+                _moveQueue.Add(performingMove);
+                _currentAttack.NextMoveListen = false;
+                _moveListened = true;
+            }
+        }
+        else
+        {
+            Debug.Log("Non jump cancelled jump ");
+            _moveQueue.Add(performingMove);
+        }
     }
 
     public void StartAttack()
     {
-        this.gameObject.GetComponent<PlayerControllerScript>().StopMovement();
-        //Debug.Log("In StartAttack");
+        Debug.Log("In StartAttack");
         Attack performingAttack = null;
         //attacking, check attack's list of chains
         if (gameObject.GetComponent<Fighter>().Attacking && _currentAttack != null)

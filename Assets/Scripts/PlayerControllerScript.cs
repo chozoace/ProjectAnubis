@@ -13,6 +13,7 @@ public class PlayerControllerScript : MonoBehaviour
     int _jumpHash = Animator.StringToHash("Jump");
     static PlayerControllerScript _instance;
     Fighter _fighterRef;
+    Jump _playerJump;
 
     public static PlayerControllerScript Instance()
     {
@@ -25,6 +26,8 @@ public class PlayerControllerScript : MonoBehaviour
         _combatScript = GetComponent<PlayerCombatScript>();
         _fighterRef = this.gameObject.GetComponent<Fighter>();
         _instance = this;
+        _playerJump = this.gameObject.AddComponent<Jump>();
+        Debug.Log("_playerjump is " + _playerJump);
 	}
 
 	void Update () 
@@ -90,14 +93,17 @@ public class PlayerControllerScript : MonoBehaviour
                 _combatScript.StartAttack();
             }
             if (inputDevice.Action1.WasPressed && _fighterRef.Grounded)
-                Jump();
+            {
+                Debug.Log("player controller calling add jump with " + _playerJump);
+                _combatScript.AddJump(_playerJump);
+            }
         }
         else
         {
             if (Input.GetKeyDown(KeyCode.J))
                 _combatScript.StartAttack();
             else if (Input.GetKeyDown(KeyCode.Space))
-                Jump();
+                _combatScript.AddJump(_playerJump);
         }
 
 	}
