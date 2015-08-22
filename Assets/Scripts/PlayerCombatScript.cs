@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 
 public class PlayerCombatScript : MonoBehaviour 
 {
@@ -81,6 +82,13 @@ public class PlayerCombatScript : MonoBehaviour
             _moveQueue.RemoveAt(0);
 
             _currentAttack = (Attack)Instantiate(_attackPrefab, this.gameObject.transform.position, Quaternion.identity);
+            /*MethodInfo info = typeof(Rigidbody2D).GetMethod("Start", BindingFlags.Public | BindingFlags.NonPublic);
+            if (info != null)
+            {
+                info.Invoke(_currentAttack.GetComponent<Rigidbody2D>(), null);
+            }
+            else
+                Debug.Log("Info is null");*/
             _currentAttack.Execute(_fighterRef, this);
             _moveListened = false;
         }
@@ -162,6 +170,8 @@ public class PlayerCombatScript : MonoBehaviour
     public void AttackFinsihed()
     {
         //Debug.Log("Attack End");
+        //Enable fighter collisions
+
         this.gameObject.GetComponent<Rigidbody2D>().gravityScale = 2;
         this.gameObject.transform.position = _currentAttack.transform.position;
         _attackPrefab = null;

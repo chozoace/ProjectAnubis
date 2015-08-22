@@ -31,6 +31,11 @@ public class Attack : Move
         _hitboxCollided = false;
 	}
 
+    void ExecuteAttack()
+    {
+
+    }
+
     public Attack CheckLinkers()
     {
         //Debug.Log("In check linkers");
@@ -75,29 +80,33 @@ public class Attack : Move
 
     public override void Execute(Fighter fighterRef, PlayerCombatScript combatScript)
     {
+        Debug.Log("Attack Execute");
+        this.gameObject.SetActive(true);
+        this.gameObject.GetComponent<SpriteRenderer>().enabled = true;
         _fighterRef = fighterRef;
+        _combatScript = combatScript;
         _fighterRef.disableAnimator();
-        _fighterRef.GetComponent<PlayerControllerScript>().StopMovement();
+        //turn off collisions for fighter ref
+
+        Rigidbody2D body = this.gameObject.GetComponent<Rigidbody2D>();
 
         if (_airAttack)
         {
             //If air attack, dont stop momentum, but pause it on hit.
             //Create on hit function
-            _fighterRef.GetComponent<Rigidbody2D>().gravityScale = 0;
-            //this.gameObject.GetComponent<Rigidbody2D>().gravityScale = _fighterRef.GetComponent<Rigidbody2D>().gravityScale;
-            //this.gameObject.GetComponent<Rigidbody2D>().velocity = _fighterRef.GetComponent<Rigidbody2D>().velocity;
+            body.gravityScale = _fighterRef.GetComponent<Rigidbody2D>().gravityScale;
+            Vector2 v = _fighterRef.GetComponent<Rigidbody2D>().velocity;
+            body.velocity = v;
+            Debug.Log("Fighter velocity: " + v);
+            Debug.Log("Attack velocity: " + body.velocity);
         }
+        _fighterRef.GetComponent<PlayerControllerScript>().StopMovement();
 
         if (!_fighterRef.FacingRight)
             transform.localScale = new Vector3(1, transform.localScale.y, transform.localScale.z);
         else
             transform.localScale = new Vector3(-1, transform.localScale.y, transform.localScale.z);
-
-        this.gameObject.SetActive(true);
-        this.gameObject.GetComponent<SpriteRenderer>().enabled = true;
         //Debug.Log("Attack Execute: " + _attackName);
-        _fighterRef = fighterRef;
-        _combatScript = combatScript;
     }
 
 	void Update () 
