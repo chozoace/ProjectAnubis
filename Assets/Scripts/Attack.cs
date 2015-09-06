@@ -10,6 +10,7 @@ public class Attack : Move
     [SerializeField] float _hitstunTime;
     [SerializeField] float _xLaunchSpeed;
     [SerializeField] float _yLaunchSpeed;
+    [SerializeField] float _hitstunFreezeTime = 0;
 
     [SerializeField] List<Attack> _linkerList;
 
@@ -72,10 +73,56 @@ public class Attack : Move
             Fighter enemyRef = other.gameObject.GetComponent<Fighter>();
             Debug.Log(other.gameObject.name + " is a fighter");
 
-            //apply damage, apply hitstun time, apply translation
-            enemyRef.EnterHitstun(_hitstunTime);
-            enemyRef.ApplyAttackForce(new Vector2(_xLaunchSpeed, _yLaunchSpeed));
+            //apply damage, apply hitstun time, apply translation, or hit pause
+            if (_hitstunFreezeTime > 0 && _fighterRef.InHitstunFreeze == false && enemyRef.Grounded == false)
+            {
+                StartCoroutine(AttackFreeze(enemyRef));
+            }
+            else
+            {
+                enemyRef.EnterHitstun(_hitstunTime);
+                enemyRef.ApplyAttackForce(new Vector2(_xLaunchSpeed, _yLaunchSpeed));
+            }
         }
+    }
+
+    IEnumerator AttackFreeze(Fighter enemyRef)
+    {
+        _fighterRef.InHitstunFreeze = true;
+        enemyRef.InHitstunFreeze = true;
+
+        Debug.Log("entered hit freeze");
+        enemyRef.EnterHitstun();
+        //Freeze both player and target for x time
+        Vector2 thisVelocity = _fighterRef.GetComponent<Rigidbody2D>().velocity;
+        Vector2 otherVelocity = enemyRef.GetComponent<Rigidbody2D>().velocity;
+        thisVelocity.y += 1;
+        otherVelocity.y += 2.5f;
+        float thisGravity = _fighterRef.GetComponent<Rigidbody2D>().gravityScale;
+        float otherGravity = enemyRef.GetComponent<Rigidbody2D>().gravityScale;
+        _anim.speed = 0;
+        _fighterRef.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
+        _fighterRef.GetComponent<Rigidbody2D>().gravityScale = 0;
+        enemyRef.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
+        enemyRef.GetComponent<Rigidbody2D>().gravityScale = 0;
+
+        yield return new WaitForSeconds(_hitstunFreezeTime);
+
+        _anim.speed = 1;
+        _fighterRef.GetComponent<Rigidbody2D>().velocity = thisVelocity;
+        enemyRef.GetComponent<Rigidbody2D>().velocity = otherVelocity;
+        _fighterRef.GetComponent<Rigidbody2D>().gravityScale = thisGravity;
+        enemyRef.GetComponent<Rigidbody2D>().gravityScale = otherGravity;
+        enemyRef.StartHitstunTimer(_hitstunTime);
+        _fighterRef.InHitstunFreeze = false;
+        enemyRef.InHitstunFreeze = false;
+    }
+
+    IEnumerator ExitAttackFreeze(float freezeTime)
+    {
+
+        yield return new WaitForSeconds(freezeTime);
+
     }
 
     public override void Execute(Fighter fighterRef, PlayerCombatScript combatScript)
@@ -100,7 +147,8 @@ public class Attack : Move
             Debug.Log("Fighter velocity: " + v);
             Debug.Log("Attack velocity: " + body.velocity);
         }
-        _fighterRef.GetComponent<PlayerControllerScript>().StopMovement();
+        else
+            _fighterRef.GetComponent<PlayerControllerScript>().StopMovement();
 
         if (!_fighterRef.FacingRight)
             transform.localScale = new Vector3(1, transform.localScale.y, transform.localScale.z);
@@ -111,14 +159,28 @@ public class Attack : Move
 
 	void Update () 
     {
-        if (_moveFinished && !_linkerCancel)
+        bool attackEndCalled = false;
+
+        this.gameObject.transform.position = _fighterRef.transform.position;
+        if (_airAttack)
+            this.gameObject.GetComponent<Rigidbody2D>().velocity = _fighterRef.gameObject.GetComponent<Rigidbody2D>().velocity;
+        if (_moveFinished && !_linkerCancel && !attackEndCalled)
         {
+            attackEndCalled = true;
+            EndAttack();
+        }
+
+        if(_airAttack && _fighterRef.Grounded && !attackEndCalled)
+        {
+            attackEndCalled = true;
             EndAttack();
         }
 	}
 
     public void EndAttack()
     {
+        //Play Landing animation for air attack
+
         //Debug.Log("attack finsihed");
         //Debug.Log("LINKER CANCEL: " + _linkerCancel + " of " + _attackName);
         if(!_linkerCancel)

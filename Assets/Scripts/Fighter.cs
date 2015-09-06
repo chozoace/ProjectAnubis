@@ -5,6 +5,8 @@ public class Fighter : MonoBehaviour
 {
     bool _attacking = false;
     bool _grounded = false;
+    bool _inHitstunFreeze = false;
+    public bool InHitstunFreeze { get { return _inHitstunFreeze; } set { _inHitstunFreeze = value; } }
     float _xDirection;
     float _yDirection;
     public bool Attacking { get { return _attacking; } set { _attacking = value; } }
@@ -39,6 +41,7 @@ public class Fighter : MonoBehaviour
     void FixedUpdate()
     {
         _grounded = Physics2D.OverlapCircle(_groundCheck.position, _groundRadius, _whatIsGround);
+
     }
 
 	void Update () 
@@ -68,12 +71,26 @@ public class Fighter : MonoBehaviour
         _hitstunned = true;
 
         Debug.Log("EnteringHitstun");
+
+
         StartCoroutine(ExitHitstun(hitstunTime));
+    }
+
+    public void EnterHitstun()
+    {
+        StopAllCoroutines();
+        _hitstunned = true;
+    }
+
+    public void StartHitstunTimer(float timer)
+    {
+        StartCoroutine(ExitHitstun(timer));
     }
 
     public void ApplyAttackForce(Vector2 launchSpeed)
     {
-        this.gameObject.GetComponent<Rigidbody2D>().velocity = launchSpeed;
+        if(launchSpeed.x != 0 && launchSpeed.y != 0)
+            this.gameObject.GetComponent<Rigidbody2D>().velocity = launchSpeed;
     }
 
     IEnumerator ExitHitstun(float hitstunTime)
@@ -81,10 +98,10 @@ public class Fighter : MonoBehaviour
         Debug.Log("exitingHitstun");
         yield return new WaitForSeconds(hitstunTime);
         Debug.Log("exitingHitstun again");
-        while(!_grounded)
-        {
+        //while(!_grounded)
+        //{
             //wait until grounded before ending hitstun
-        }
+        //}
         _hitstunned = false;
     }
 

@@ -82,13 +82,6 @@ public class PlayerCombatScript : MonoBehaviour
             _moveQueue.RemoveAt(0);
 
             _currentAttack = (Attack)Instantiate(_attackPrefab, this.gameObject.transform.position, Quaternion.identity);
-            /*MethodInfo info = typeof(Rigidbody2D).GetMethod("Start", BindingFlags.Public | BindingFlags.NonPublic);
-            if (info != null)
-            {
-                info.Invoke(_currentAttack.GetComponent<Rigidbody2D>(), null);
-            }
-            else
-                Debug.Log("Info is null");*/
             _currentAttack.Execute(_fighterRef, this);
             _moveListened = false;
         }

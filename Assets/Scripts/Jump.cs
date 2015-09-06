@@ -4,7 +4,8 @@ using System.Collections;
 public class Jump : Move
 {
     int _jumpHash;
-    int _jumpSpeed = 7;
+    float _jumpSpeed = 7;
+    public float JumpSpeed { get { return _jumpSpeed; } set { _jumpSpeed = value; } }
 
 	// Use this for initialization
 	void Start () 
