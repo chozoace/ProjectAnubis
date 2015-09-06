@@ -27,6 +27,7 @@ public class Fighter : MonoBehaviour
     Animator _anim;
     [SerializeField] Sprite _redSprite;
     [SerializeField] Sprite _blueSprite;
+    [SerializeField] Sprite _greenSprite;
 
     [SerializeField] protected Transform _groundCheck;
     protected float _groundRadius = .2f;
@@ -48,12 +49,13 @@ public class Fighter : MonoBehaviour
     {
         if(_hitstunned)
         {
-            gameObject.GetComponent<SpriteRenderer>().sprite = _blueSprite;
+            //gameObject.GetComponent<SpriteRenderer>().sprite = _blueSprite;
         }
         else
         {
-            gameObject.GetComponent<SpriteRenderer>().sprite = _redSprite;
+            //gameObject.GetComponent<SpriteRenderer>().sprite = _redSprite;
         }
+        
         if (!Attacking)
         {
             if (!Grounded)

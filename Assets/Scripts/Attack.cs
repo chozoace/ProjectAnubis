@@ -109,7 +109,7 @@ public class Attack : Move
         if (_slamSpeed != 0)
         {
             otherVelocity.y = _slamSpeed;
-            thisVelocity.y += 8;
+            thisVelocity.y = 6;
             if (otherVelocity.x > 0)
                 otherVelocity.x += 4;
             else
@@ -117,7 +117,7 @@ public class Attack : Move
         }
         else
         {
-            otherVelocity.y += 4.5f;
+            otherVelocity.y += 4f;
         }
         float thisGravity = _fighterRef.GetComponent<Rigidbody2D>().gravityScale;
         float otherGravity = enemyRef.GetComponent<Rigidbody2D>().gravityScale;
