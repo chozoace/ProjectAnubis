@@ -11,6 +11,7 @@ public class Attack : Move
     [SerializeField] float _xLaunchSpeed;
     [SerializeField] float _yLaunchSpeed;
     [SerializeField] float _hitstunFreezeTime = 0;
+    [SerializeField] float _slamSpeed = 0;
 
     [SerializeField] List<Attack> _linkerList;
 
@@ -62,26 +63,34 @@ public class Attack : Move
     //On collision Enter, Ignores fighterRef's hurtboxes
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (!_fighterRef.FacingRight && !_hitboxCollided)
+        if (other.offset.y >= 0)
         {
-            _xLaunchSpeed = (float)(_xLaunchSpeed * -1.0f);
-            _hitboxCollided = true;
-        }
-        Debug.Log("collision at: " + other.gameObject.name);
-        if(other.gameObject.GetComponent<Fighter>() != null && other.gameObject.GetComponent<Fighter>() != _fighterRef)
-        {
-            Fighter enemyRef = other.gameObject.GetComponent<Fighter>();
-            Debug.Log(other.gameObject.name + " is a fighter");
-
-            //apply damage, apply hitstun time, apply translation, or hit pause
-            if (_hitstunFreezeTime > 0 && _fighterRef.InHitstunFreeze == false && enemyRef.Grounded == false)
+            if (!_fighterRef.FacingRight && !_hitboxCollided)
             {
-                StartCoroutine(AttackFreeze(enemyRef));
+                _xLaunchSpeed = (float)(_xLaunchSpeed * -1.0f);
+                _hitboxCollided = true;
             }
-            else
+            Debug.Log("collision at: " + other.gameObject.name);
+            if (other.gameObject.GetComponent<Fighter>() != null && other.gameObject.GetComponent<Fighter>() != _fighterRef)
             {
-                enemyRef.EnterHitstun(_hitstunTime);
-                enemyRef.ApplyAttackForce(new Vector2(_xLaunchSpeed, _yLaunchSpeed));
+                Fighter enemyRef = other.gameObject.GetComponent<Fighter>();
+                Debug.Log(other.gameObject.name + " is a fighter");
+
+                //apply damage, apply hitstun time, apply translation, or hit pause
+                if (_hitstunFreezeTime > 0 && _fighterRef.InHitstunFreeze == false && enemyRef.Grounded == false)
+                {
+                    Debug.Log("enter coroutine");
+                    StartCoroutine(AttackFreeze(enemyRef));
+                }
+                else
+                {
+                    if (_airAttack)
+                    {
+                        Debug.Log("enter regular");
+                    }
+                    enemyRef.EnterHitstun(_hitstunTime);
+                    enemyRef.ApplyAttackForce(new Vector2(_xLaunchSpeed, _yLaunchSpeed));
+                }
             }
         }
     }
@@ -96,8 +105,20 @@ public class Attack : Move
         //Freeze both player and target for x time
         Vector2 thisVelocity = _fighterRef.GetComponent<Rigidbody2D>().velocity;
         Vector2 otherVelocity = enemyRef.GetComponent<Rigidbody2D>().velocity;
-        thisVelocity.y += 1;
-        otherVelocity.y += 2.5f;
+        thisVelocity.y += 3;
+        if (_slamSpeed != 0)
+        {
+            otherVelocity.y = _slamSpeed;
+            thisVelocity.y += 8;
+            if (otherVelocity.x > 0)
+                otherVelocity.x += 4;
+            else
+                otherVelocity.x -= 4;
+        }
+        else
+        {
+            otherVelocity.y += 4.5f;
+        }
         float thisGravity = _fighterRef.GetComponent<Rigidbody2D>().gravityScale;
         float otherGravity = enemyRef.GetComponent<Rigidbody2D>().gravityScale;
         _anim.speed = 0;
@@ -120,9 +141,7 @@ public class Attack : Move
 
     IEnumerator ExitAttackFreeze(float freezeTime)
     {
-
         yield return new WaitForSeconds(freezeTime);
-
     }
 
     public override void Execute(Fighter fighterRef, PlayerCombatScript combatScript)

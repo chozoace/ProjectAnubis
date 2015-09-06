@@ -91,7 +91,7 @@ public class PlayerControllerScript : MonoBehaviour
                 //CHECK FOR JUMP HEIGHT, ONLY TRIGGER AT MID-HIGH HEIGHT(when speed is 0 or greater)
                 //Debug.Log("position before attack: " + transform.position);
                 //StopMovement();
-                if(gameObject.GetComponent<Rigidbody2D>().velocity.y < _jumpSpeed - 1)
+                if(gameObject.GetComponent<Rigidbody2D>().velocity.y < _jumpSpeed - 1.8)
                     _combatScript.StartAttack();
             }
             if (inputDevice.Action1.WasPressed && _fighterRef.Grounded)
