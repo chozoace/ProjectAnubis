@@ -225,6 +225,12 @@
      <Compile Include="Assets\InControl\Test\TestInputManager.cs" />
      <Compile Include="Assets\Scripts\Attack.cs" />
      <Compile Include="Assets\Scripts\EnemyAI.cs" />
+     <Compile Include="Assets\Scripts\EnemyStates\EnemyApproachState.cs" />
+     <Compile Include="Assets\Scripts\EnemyStates\EnemyAttackState.cs" />
+     <Compile Include="Assets\Scripts\EnemyStates\EnemyAttackWaitState.cs" />
+     <Compile Include="Assets\Scripts\EnemyStates\EnemyPatrolState.cs" />
+     <Compile Include="Assets\Scripts\EnemyStates\EnemyRetreatState.cs" />
+     <Compile Include="Assets\Scripts\EnemyStates\State.cs" />
      <Compile Include="Assets\Scripts\Fighter.cs" />
      <Compile Include="Assets\Scripts\Jump.cs" />
      <Compile Include="Assets\Scripts\Move.cs" />

@@ -109,7 +109,7 @@ public class Attack : Move
         if (_slamSpeed != 0)
         {
             otherVelocity.y = _slamSpeed;
-            thisVelocity.y = 6;
+            thisVelocity.y = 4;
             if (otherVelocity.x > 0)
                 otherVelocity.x += 4;
             else
