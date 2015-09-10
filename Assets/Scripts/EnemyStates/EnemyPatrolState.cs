@@ -28,11 +28,11 @@ public class EnemyPatrolState : State
 
             if (Mathf.Abs(_myPosition.x - _playerPosition.x) <= 4)
             {
-                Debug.Log("out of patrol");
+                //Debug.Log("out of patrol");
                 _fighterRef.ChangeState(new EnemyApproachState(_fighterRef));
             }
-            else
-                Debug.Log("On patrol");
+            //else
+                //Debug.Log("On patrol");
         }
         else
         {

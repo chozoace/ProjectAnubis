@@ -19,7 +19,7 @@ public class EnemyApproachState : State
 
     public override void UpdateState()
     {
-        Debug.Log("ApproachState");
+        //Debug.Log("ApproachState");
         
         //Move the enemy towards player
 

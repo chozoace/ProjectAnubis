@@ -7,6 +7,7 @@ public class PlayerControllerScript : MonoBehaviour
     [SerializeField] float _maxSpeed = 30;
     [SerializeField] float _jumpSpeed = 3;
     float _currentXSpeed;
+    float keyboardXDir = 0;
 
     Animator _anim;
     PlayerCombatScript _combatScript;
@@ -46,13 +47,15 @@ public class PlayerControllerScript : MonoBehaviour
             else
             {
                 if (Input.GetKeyDown(KeyCode.D))
-                    _currentXSpeed = _maxSpeed;
+                    keyboardXDir = 1;
                 else if (Input.GetKeyDown(KeyCode.A))
-                    _currentXSpeed = -_maxSpeed;
+                    keyboardXDir = -1;
                 if (Input.GetKeyUp(KeyCode.D) || Input.GetKeyUp(KeyCode.A))
-                    _currentXSpeed = 0;
-            }
+                    keyboardXDir = 0;
 
+                _currentXSpeed = (_maxSpeed * keyboardXDir);
+            }
+            Debug.Log("keyboardDir: " + keyboardXDir);
             Vector2 v = gameObject.GetComponent<Rigidbody2D>().velocity;
             v.x = _currentXSpeed;
 
@@ -91,7 +94,7 @@ public class PlayerControllerScript : MonoBehaviour
                 //CHECK FOR JUMP HEIGHT, ONLY TRIGGER AT MID-HIGH HEIGHT(when speed is 0 or greater)
                 //Debug.Log("position before attack: " + transform.position);
                 //StopMovement();
-                if(gameObject.GetComponent<Rigidbody2D>().velocity.y < _jumpSpeed)
+                if(gameObject.GetComponent<Rigidbody2D>().velocity.y < _jumpSpeed - 1)
                     _combatScript.StartAttack();
             }
             if (inputDevice.Action1.WasPressed && _fighterRef.Grounded)
@@ -103,7 +106,10 @@ public class PlayerControllerScript : MonoBehaviour
         else
         {
             if (Input.GetKeyDown(KeyCode.J))
-                _combatScript.StartAttack();
+            {
+                if (gameObject.GetComponent<Rigidbody2D>().velocity.y < _jumpSpeed - 1)
+                    _combatScript.StartAttack();
+            }
             else if (Input.GetKeyDown(KeyCode.Space))
                 _combatScript.AddJump(_playerJump);
         }
