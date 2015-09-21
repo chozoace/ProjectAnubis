@@ -26,7 +26,7 @@ public class EnemyPatrolState : State
             _playerPosition = _playerRef.transform.position;
             _myPosition = _fighterRef.transform.position;
 
-            if (Mathf.Abs(_myPosition.x - _playerPosition.x) <= 4)
+            if (Mathf.Abs(_myPosition.x - _playerPosition.x) <= 5)
             {
                 //Debug.Log("out of patrol");
                 _fighterRef.ChangeState(new EnemyApproachState(_fighterRef));

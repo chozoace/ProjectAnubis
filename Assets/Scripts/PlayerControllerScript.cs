@@ -55,7 +55,6 @@ public class PlayerControllerScript : MonoBehaviour
 
                 _currentXSpeed = (_maxSpeed * keyboardXDir);
             }
-            Debug.Log("keyboardDir: " + keyboardXDir);
             Vector2 v = gameObject.GetComponent<Rigidbody2D>().velocity;
             v.x = _currentXSpeed;
 

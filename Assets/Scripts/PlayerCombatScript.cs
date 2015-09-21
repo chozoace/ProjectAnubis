@@ -166,7 +166,9 @@ public class PlayerCombatScript : MonoBehaviour
         //Enable fighter collisions
 
         this.gameObject.GetComponent<Rigidbody2D>().gravityScale = 2;
-        this.gameObject.transform.position = _currentAttack.transform.position;
+        GameObject.Destroy(_currentAttack.gameObject);
+        if(_currentAttack)
+            this.gameObject.transform.position = _currentAttack.transform.position;
         _attackPrefab = null;
         _currentAttack = null;
         _fighterRef.Attacking = false;

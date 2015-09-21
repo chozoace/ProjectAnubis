@@ -232,6 +232,7 @@
      <Compile Include="Assets\Scripts\EnemyStates\EnemyRetreatState.cs" />
      <Compile Include="Assets\Scripts\EnemyStates\State.cs" />
      <Compile Include="Assets\Scripts\Fighter.cs" />
+     <Compile Include="Assets\Scripts\GameController.cs" />
      <Compile Include="Assets\Scripts\Jump.cs" />
      <Compile Include="Assets\Scripts\Move.cs" />
      <Compile Include="Assets\Scripts\PlayerCombatScript.cs" />

@@ -33,11 +33,6 @@ public class Attack : Move
         _hitboxCollided = false;
 	}
 
-    void ExecuteAttack()
-    {
-
-    }
-
     public Attack CheckLinkers()
     {
         //Debug.Log("In check linkers");
@@ -166,8 +161,12 @@ public class Attack : Move
             Debug.Log("Fighter velocity: " + v);
             Debug.Log("Attack velocity: " + body.velocity);
         }
-        else
+        else if (_fighterRef.tag == "Player")
             _fighterRef.GetComponent<PlayerControllerScript>().StopMovement();
+        else
+        {
+
+        }
 
         if (!_fighterRef.FacingRight)
             transform.localScale = new Vector3(1, transform.localScale.y, transform.localScale.z);

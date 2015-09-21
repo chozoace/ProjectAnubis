@@ -14,20 +14,22 @@ public class EnemyAttackWaitState : State
 
     public override void Enter()
     {
-        base.Enter();
+        //Start wait timer after wait timer, check number of enemies attacking
+        //if none go to attack state
+        //else if player has moved
     }
 
     public override void UpdateState()
     {
         Debug.Log("AttackWaitState");
         
-        //Move the enemy towards player
+        
 
         base.UpdateState();
     }
 
     public override void Exit()
     {
-        base.Exit();
+        
     }
 }

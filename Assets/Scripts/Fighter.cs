@@ -71,6 +71,10 @@ public class Fighter : MonoBehaviour
     {
         StopAllCoroutines();
         _hitstunned = true;
+        if(_attacking)
+        {
+            GetComponent<PlayerCombatScript>().AttackFinsihed();
+        }
 
         Debug.Log("EnteringHitstun");
 
