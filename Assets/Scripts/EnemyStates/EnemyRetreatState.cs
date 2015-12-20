@@ -14,16 +14,16 @@ public class EnemyRetreatState : State
 
     public override void Enter()
     {
-        Debug.Log("entered retreat");
         _playerRef = GameObject.FindGameObjectWithTag("Player");
         _maxSpeed = _fighterRef.MaxSpeed - .5f;
         _fighterRigidBody = _fighterRef.GetComponent<Rigidbody2D>();
+
+        _fighterRef._walkingReversed = true;
     }
 	
 	// Update is called once per frame
     public override void UpdateState()
     {
-        Debug.Log("In Retreat state");
         if (!_fighterRef.GetComponent<Fighter>().IsHitstunned)
         {
             //Move the enemy towards player
@@ -49,6 +49,6 @@ public class EnemyRetreatState : State
 
     public override void Exit()
     {
-        
+        _fighterRef._walkingReversed = false;
     }
 }

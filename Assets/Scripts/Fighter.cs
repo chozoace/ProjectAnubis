@@ -14,6 +14,7 @@ public class Fighter : MonoBehaviour
     public float XDirection { get { return _xDirection; } set { _xDirection = value; } }
     public float YDirection { get { return _yDirection; } set { _yDirection = value; } }
 
+    //Animation states
     public enum PlayerState { Idle, Airbourne, Walking, };
     PlayerState _currentState = PlayerState.Idle;
     public PlayerState GetPlayerState { get { return _currentState; } }

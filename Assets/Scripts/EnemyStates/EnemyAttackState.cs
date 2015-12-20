@@ -22,7 +22,6 @@ public class EnemyAttackState : State
 	
 	public override void UpdateState() 
     {
-	    Debug.Log("AttackState");
         if (!_fighterRef.GetComponent<Fighter>().IsHitstunned)
         {
             //Move the enemy towards player

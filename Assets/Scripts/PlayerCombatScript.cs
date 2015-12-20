@@ -122,7 +122,7 @@ public class PlayerCombatScript : MonoBehaviour
     {
         Debug.Log("In StartAttack");
         Attack performingAttack = null;
-        //attacking, check attack's list of chains
+        //if attacking, check attack's list of chains
         if (gameObject.GetComponent<Fighter>().Attacking && _currentAttack != null)
         {
             //Debug.Log("checking list of chains: " + _currentAttack.NextMoveListen);

@@ -74,7 +74,7 @@ public class Attack : Move
                 //apply damage, apply hitstun time, apply translation, or hit pause
                 if (_hitstunFreezeTime > 0 && _fighterRef.InHitstunFreeze == false && enemyRef.Grounded == false)
                 {
-                    Debug.Log("enter coroutine");
+                    //SHOULD BE APPLIED FOR ALL ATTACKS NOT JUST AIR
                     StartCoroutine(AttackFreeze(enemyRef));
                 }
                 else
@@ -83,13 +83,15 @@ public class Attack : Move
                     {
                         Debug.Log("enter regular");
                     }
+                    //If already hitstun, reenter hitstun and play hit animation again
+                    //Duration is determined by hitstun time;
                     enemyRef.EnterHitstun(_hitstunTime);
                     enemyRef.ApplyAttackForce(new Vector2(_xLaunchSpeed, _yLaunchSpeed));
                 }
             }
         }
     }
-
+    //Currently only does air attack freeze ADD ONE FOR GROUND
     IEnumerator AttackFreeze(Fighter enemyRef)
     {
         _fighterRef.InHitstunFreeze = true;

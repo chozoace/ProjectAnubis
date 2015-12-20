@@ -29,7 +29,6 @@ public class PlayerControllerScript : MonoBehaviour
         _instance = this;
         _playerJump = this.gameObject.AddComponent<Jump>();
         _playerJump.JumpSpeed = _jumpSpeed;
-        Debug.Log("_playerjump is " + _playerJump);
 	}
 
 	void Update () 

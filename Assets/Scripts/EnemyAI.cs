@@ -14,6 +14,7 @@ public class EnemyAI : MonoBehaviour
     public float MaxSpeed { get { return _maxSpeed; } }
 
     Rigidbody2D _myRigidbody;
+    public bool _walkingReversed;
 
 	void Start () 
     {
@@ -35,7 +36,7 @@ public class EnemyAI : MonoBehaviour
 
 	void Update ()
     {
-        //_anim.SetFloat("XSpeed", Mathf.Abs(_myRigidbody.velocity.x));
+        _anim.SetFloat("XSpeed", Mathf.Abs(_myRigidbody.velocity.x));
         //_anim.SetFloat("YSpeed", _myRigidbody.velocity.y);
         _anim.SetBool("Hitstunned", _fighterRef.IsHitstunned);
         _anim.SetBool("Grounded", _fighterRef.Grounded);
@@ -48,7 +49,16 @@ public class EnemyAI : MonoBehaviour
         else if (GetComponent<Rigidbody2D>().velocity.x < 0)
             _fighterRef.FacingRight = false;
 
-        Debug.Log(_fighterRef.FacingRight);
+        if (_walkingReversed && _fighterRef.FacingRight == true)
+            _fighterRef.FacingRight = false;
+        else if (_walkingReversed && _fighterRef.FacingRight == false)
+            _fighterRef.FacingRight = true;
+
+        if (!_fighterRef.FacingRight)
+            transform.localScale = new Vector3(1, transform.localScale.y, transform.localScale.z);
+        else
+            transform.localScale = new Vector3(-1, transform.localScale.y, transform.localScale.z);
+
         _currentState.UpdateState();
 	}
 }
