@@ -6,6 +6,8 @@ public class Move : MonoBehaviour
 {
     [SerializeField] string _moveName = "Default";
     [SerializeField] protected List<string> _acceptedStates;
+    [SerializeField] protected char _attackInput;
+    public int _attackRank;
     [SerializeField] protected int _priority;
     [SerializeField] string _animationName = "Default";
     [SerializeField] protected bool _nextMoveListen;
@@ -25,9 +27,18 @@ public class Move : MonoBehaviour
     public bool IsJump { get { return _isJump; } }
 
 	// Use this for initialization
-	void Start () 
+	void Awake () 
     {
-	
+        Debug.Log("Awake");
+	    switch(_attackInput)
+        {
+            case 'X':
+                _attackRank = 0;
+                break;
+            case 'Y':
+                _attackRank = 1;
+                break;
+        }
 	}
 	
     public virtual void Execute(Fighter fighterRef, PlayerCombatScript combatScript)
@@ -35,14 +46,21 @@ public class Move : MonoBehaviour
 
     }
 
-    public virtual bool ConditionsMet(Fighter theFighter)
+    public virtual bool ConditionsMet(Fighter theFighter, int input)
     {
         string currentState = theFighter.GetPlayerState.ToString();
+        //checks input too
 
         foreach (string acceptedState in _acceptedStates)
         {
             if (currentState == acceptedState)
-                return true;
+            {
+                if (input == _attackRank)
+                {
+                    Debug.Log("Conditions Met");
+                    return true;
+                }
+            }
         }
 
         return false;

@@ -118,8 +118,12 @@ public class PlayerCombatScript : MonoBehaviour
         }
     }
 
-    public void StartAttack()
+    public void StartAttack(int attackRank = 0)
     {
+        //attackRank 0 = normal attack
+        //1 = Cast
+        //2 = Soul
+
         Debug.Log("In StartAttack");
         Attack performingAttack = null;
         //if attacking, check attack's list of chains
@@ -130,7 +134,7 @@ public class PlayerCombatScript : MonoBehaviour
             if(_currentAttack.NextMoveListen && !_moveListened)
             {
                //Debug.Log("checking next move linkers");
-                performingAttack = _currentAttack.CheckLinkers();
+                performingAttack = _currentAttack.CheckLinkers(attackRank);
                 _currentAttack.NextMoveListen = false;
                 _moveListened = true;
             }
@@ -141,7 +145,8 @@ public class PlayerCombatScript : MonoBehaviour
             //Debug.Log("checking list of opening");
             foreach (Attack theAttack in _openingAttacks)
             {
-                if(theAttack.ConditionsMet(_fighterRef))
+                Debug.Log(theAttack._attackRank);
+                if(theAttack.ConditionsMet(_fighterRef, attackRank))
                 {
                     performingAttack = theAttack;
                     //break is temporary, if more than one attack meets conditions, choose by priority
@@ -160,9 +165,10 @@ public class PlayerCombatScript : MonoBehaviour
         //Debug.Log("attackQueue length: " + _moveQueue.Count);
     }
 
+
+
     public void AttackFinsihed()
     {
-        //Debug.Log("Attack End");
         //Enable fighter collisions
 
         this.gameObject.GetComponent<Rigidbody2D>().gravityScale = 2;

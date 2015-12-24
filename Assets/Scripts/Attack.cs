@@ -33,7 +33,7 @@ public class Attack : Move
         _hitboxCollided = false;
 	}
 
-    public Attack CheckLinkers()
+    public Attack CheckLinkers(int attackRank)
     {
         //Debug.Log("In check linkers");
         Attack result = null;
@@ -41,7 +41,7 @@ public class Attack : Move
         {
             if (linker != null)
             {
-                if (linker.ConditionsMet(_fighterRef))
+                if (linker.ConditionsMet(_fighterRef, attackRank))
                 {
                     result = linker;
                 }

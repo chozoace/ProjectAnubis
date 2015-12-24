@@ -93,13 +93,22 @@ public class PlayerControllerScript : MonoBehaviour
                 //Debug.Log("position before attack: " + transform.position);
                 //StopMovement();
                 if(gameObject.GetComponent<Rigidbody2D>().velocity.y < _jumpSpeed - 1)
-                    _combatScript.StartAttack();
+                    _combatScript.StartAttack(0);
+            }
+            else if(inputDevice.Action4.WasPressed)
+            {
+                Debug.Log("Pressed Y");
+                //Y Button Press
+                //if (gameObject.GetComponent<Rigidbody2D>().velocity.y < _jumpSpeed - 1)
+                if (gameObject.GetComponent<Rigidbody2D>().velocity.y == 0)
+                    _combatScript.StartAttack(1);
             }
             if (inputDevice.Action1.WasPressed && _fighterRef.Grounded)
             {
                 Debug.Log("player controller calling add jump with " + _playerJump);
                 _combatScript.AddJump(_playerJump);
             }
+
         }
         else
         {
