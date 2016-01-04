@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 public class Attack : Move 
 {
+    [Header("Attack Data")]
     [SerializeField] bool _activeHitbox = false;
     [SerializeField] bool _airAttack;
     [SerializeField] int _damage;
@@ -12,7 +13,6 @@ public class Attack : Move
     [SerializeField] float _yLaunchSpeed;
     [SerializeField] float _hitstunFreezeTime = 0;
     [SerializeField] float _slamSpeed = 0;
-
     [SerializeField] List<Attack> _linkerList;
 
     Fighter _fighterRef;

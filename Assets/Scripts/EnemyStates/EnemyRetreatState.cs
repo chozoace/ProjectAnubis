@@ -36,7 +36,7 @@ public class EnemyRetreatState : State
             {
                 _currentXSpeed = _maxSpeed;
             }
-            if (Mathf.Abs(_playerRef.transform.position.x - _fighterRef.transform.position.x) > 3)
+            if (Mathf.Abs(_playerRef.transform.position.x - _fighterRef.transform.position.x) > 2.5)
             {
                 _fighterRef.ChangeState(new EnemyApproachState(_fighterRef));
             }

@@ -4,12 +4,14 @@ using System.Collections.Generic;
 
 public class Move : MonoBehaviour 
 {
+    [Header("General Move Info")]
     [SerializeField] string _moveName = "Default";
     [SerializeField] protected List<string> _acceptedStates;
     [SerializeField] protected char _attackInput;
     public int _attackRank;
     [SerializeField] protected int _priority;
     [SerializeField] string _animationName = "Default";
+    [Header("Attack Attribute Flags (For monitoring purposes only)")]
     [SerializeField] protected bool _nextMoveListen;
     public bool NextMoveListen { get { return _nextMoveListen; } set { _nextMoveListen = value; } }
     [SerializeField] protected bool _nextMoveExecute;
@@ -17,12 +19,12 @@ public class Move : MonoBehaviour
     [SerializeField] protected bool _jumpCancel = false;
     public bool CanJumpCancel { get { return _jumpCancel; } }
     [SerializeField] protected bool _translate;
-    [SerializeField] protected float _translationDistance;
     [SerializeField] protected bool _movementCancel;
     [SerializeField] protected bool _moveFinished = false;
-
     [SerializeField] protected bool _isAttack = false;
     public bool IsAttack { get { return _isAttack; } }
+
+    [SerializeField]protected float _translationDistance;
     protected bool _isJump = false;
     public bool IsJump { get { return _isJump; } }
 
