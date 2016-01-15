@@ -31,7 +31,6 @@ public class Move : MonoBehaviour
 	// Use this for initialization
 	void Awake () 
     {
-        Debug.Log("Awake");
 	    switch(_attackInput)
         {
             case 'X':
@@ -59,7 +58,6 @@ public class Move : MonoBehaviour
             {
                 if (input == _attackRank)
                 {
-                    Debug.Log("Conditions Met");
                     return true;
                 }
             }

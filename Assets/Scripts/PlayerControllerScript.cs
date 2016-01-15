@@ -97,7 +97,6 @@ public class PlayerControllerScript : MonoBehaviour
             }
             else if(inputDevice.Action4.WasPressed)
             {
-                Debug.Log("Pressed Y");
                 //Y Button Press
                 //if (gameObject.GetComponent<Rigidbody2D>().velocity.y < _jumpSpeed - 1)
                 if (gameObject.GetComponent<Rigidbody2D>().velocity.y == 0)
@@ -105,7 +104,6 @@ public class PlayerControllerScript : MonoBehaviour
             }
             if (inputDevice.Action1.WasPressed && _fighterRef.Grounded)
             {
-                Debug.Log("player controller calling add jump with " + _playerJump);
                 _combatScript.AddJump(_playerJump);
             }
 

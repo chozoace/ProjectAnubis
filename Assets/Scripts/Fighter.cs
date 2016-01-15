@@ -4,7 +4,7 @@ using System.Collections;
 public class Fighter : MonoBehaviour 
 {
     bool _attacking = false;
-    bool _grounded = false;
+    public bool _grounded = false;
     bool _inHitstunFreeze = false;
     public bool InHitstunFreeze { get { return _inHitstunFreeze; } set { _inHitstunFreeze = value; } }
     float _xDirection;
@@ -21,6 +21,8 @@ public class Fighter : MonoBehaviour
     //no movement or attacks are allowed during hitstunned
     bool _hitstunned;
     public bool IsHitstunned { get { return _hitstunned; } }
+    public bool _groundBounceState = false;
+    public bool GroundBounceState { get { return _groundBounceState; } set { _groundBounceState = value; } }
 
     bool _facingRight = true;
     public bool FacingRight { get { return _facingRight; } set { _facingRight = value; } }
@@ -43,7 +45,12 @@ public class Fighter : MonoBehaviour
     void FixedUpdate()
     {
         _grounded = Physics2D.OverlapCircle(_groundCheck.position, _groundRadius, _whatIsGround);
-
+        if(_grounded && _groundBounceState)
+        {
+            _groundBounceState = false;
+            EnterGroundBounce();
+            Debug.Log("Ground Bounce");
+        }
     }
 
 	void Update () 
@@ -68,6 +75,12 @@ public class Fighter : MonoBehaviour
         }
 	}
 
+    public void EnterGroundBounce()
+    {
+        Vector2 groundBounceSpeed = new Vector2(0, 8);
+        this.gameObject.GetComponent<Rigidbody2D>().velocity = groundBounceSpeed;
+    }
+
     public void EnterHitstun(float hitstunTime)
     {
         StopAllCoroutines();
@@ -76,9 +89,6 @@ public class Fighter : MonoBehaviour
         {
             GetComponent<PlayerCombatScript>().AttackFinsihed();
         }
-
-        Debug.Log("EnteringHitstun");
-
 
         StartCoroutine(ExitHitstun(hitstunTime));
     }
@@ -102,9 +112,7 @@ public class Fighter : MonoBehaviour
 
     IEnumerator ExitHitstun(float hitstunTime)
     {
-        Debug.Log("exitingHitstun");
         yield return new WaitForSeconds(hitstunTime);
-        Debug.Log("exitingHitstun again");
         //while(!_grounded)
         //{
             //wait until grounded before ending hitstun

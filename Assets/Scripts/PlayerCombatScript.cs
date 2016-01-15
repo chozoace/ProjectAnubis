@@ -18,7 +18,6 @@ public class PlayerCombatScript : MonoBehaviour
 
 	void Start () 
     {
-        Debug.Log("combat script start");
         _moveQueue = new List<Move>();
         _fighterRef = this.gameObject.GetComponent<Fighter>();
 	}
@@ -34,7 +33,6 @@ public class PlayerCombatScript : MonoBehaviour
             {
                 if (_moveQueue[0].IsJump && _currentAttack.CanJumpCancel)
                 {
-                    Debug.Log("Jump entering execution");
                     _currentAttack.EndAttack();
                     ExecuteMove(_moveQueue[0]);
                 }
@@ -75,7 +73,6 @@ public class PlayerCombatScript : MonoBehaviour
         //Debug.Log("Choosing attack from attack queue");
         //Try and have this go through the list until it finds
         //a viable attack, any non viable attacks are thrown away
-        Debug.Log("in execute move with " + _moveQueue[0].name);
         if (_moveQueue[0].IsAttack)
         {
             _attackPrefab = (Attack)_moveQueue[0];
@@ -87,7 +84,6 @@ public class PlayerCombatScript : MonoBehaviour
         }
         else if(_moveQueue[0].IsJump)
         {
-            Debug.Log("Inside of execute move if statement");
             _movePrefab = _moveQueue[0];
             _moveQueue.RemoveAt(0);
             _movePrefab.Execute(_fighterRef, this);
@@ -99,13 +95,10 @@ public class PlayerCombatScript : MonoBehaviour
     {
         Move performingMove = theMove;
 
-        Debug.Log(performingMove);
-
         if (gameObject.GetComponent<Fighter>().Attacking && _currentAttack != null)
         {
             if(_currentAttack.NextMoveListen && !_moveListened)
             {
-                Debug.Log("jump cancelled jump");
                 _moveQueue.Add(performingMove);
                 _currentAttack.NextMoveListen = false;
                 _moveListened = true;
@@ -113,7 +106,6 @@ public class PlayerCombatScript : MonoBehaviour
         }
         else
         {
-            Debug.Log("Non jump cancelled jump ");
             _moveQueue.Add(performingMove);
         }
     }
@@ -124,7 +116,6 @@ public class PlayerCombatScript : MonoBehaviour
         //1 = Cast
         //2 = Soul
 
-        Debug.Log("In StartAttack");
         Attack performingAttack = null;
         //if attacking, check attack's list of chains
         if (gameObject.GetComponent<Fighter>().Attacking && _currentAttack != null)
@@ -145,7 +136,6 @@ public class PlayerCombatScript : MonoBehaviour
             //Debug.Log("checking list of opening");
             foreach (Attack theAttack in _openingAttacks)
             {
-                Debug.Log(theAttack._attackRank);
                 if(theAttack.ConditionsMet(_fighterRef, attackRank))
                 {
                     performingAttack = theAttack;

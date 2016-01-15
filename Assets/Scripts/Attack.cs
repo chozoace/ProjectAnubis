@@ -7,6 +7,7 @@ public class Attack : Move
     [Header("Attack Data")]
     [SerializeField] bool _activeHitbox = false;
     [SerializeField] bool _airAttack;
+    [SerializeField] bool _groundBounce;
     [SerializeField] int _damage;
     [SerializeField] float _hitstunTime;
     [SerializeField] float _xLaunchSpeed;
@@ -24,7 +25,6 @@ public class Attack : Move
 	
 	void Awake () 
     {
-        Debug.Log("In attack Awake");
         //doesnt set it to true fast enough? had to serialize field
         //_isAttack = true;
         _anim = gameObject.GetComponent<Animator>();
@@ -65,28 +65,34 @@ public class Attack : Move
                 _xLaunchSpeed = (float)(_xLaunchSpeed * -1.0f);
                 _hitboxCollided = true;
             }
-            Debug.Log("collision at: " + other.gameObject.name);
             if (other.gameObject.GetComponent<Fighter>() != null && other.gameObject.GetComponent<Fighter>() != _fighterRef)
             {
                 Fighter enemyRef = other.gameObject.GetComponent<Fighter>();
-                Debug.Log(other.gameObject.name + " is a fighter");
 
                 //apply damage, apply hitstun time, apply translation, or hit pause
                 if (_hitstunFreezeTime > 0 && _fighterRef.InHitstunFreeze == false && enemyRef.Grounded == false)
                 {
                     //SHOULD BE APPLIED FOR ALL ATTACKS NOT JUST AIR
                     StartCoroutine(AttackFreeze(enemyRef));
+                    if (_groundBounce)
+                    {
+                        enemyRef.GroundBounceState = true;
+                    }
                 }
                 else
                 {
                     if (_airAttack)
                     {
-                        Debug.Log("enter regular");
+                        //Debug.Log("enter regular");
                     }
                     //If already hitstun, reenter hitstun and play hit animation again
                     //Duration is determined by hitstun time;
                     enemyRef.EnterHitstun(_hitstunTime);
                     enemyRef.ApplyAttackForce(new Vector2(_xLaunchSpeed, _yLaunchSpeed));
+                    if(_groundBounce)
+                    {
+                        enemyRef.GroundBounceState = true;
+                    }
                 }
             }
         }
@@ -96,8 +102,7 @@ public class Attack : Move
     {
         _fighterRef.InHitstunFreeze = true;
         enemyRef.InHitstunFreeze = true;
-
-        Debug.Log("entered hit freeze");
+        //
         enemyRef.EnterHitstun();
         //Freeze both player and target for x time
         Vector2 thisVelocity = _fighterRef.GetComponent<Rigidbody2D>().velocity;
@@ -143,7 +148,6 @@ public class Attack : Move
 
     public override void Execute(Fighter fighterRef, PlayerCombatScript combatScript)
     {
-        Debug.Log("Attack Execute");
         this.gameObject.SetActive(true);
         this.gameObject.GetComponent<SpriteRenderer>().enabled = true;
         _fighterRef = fighterRef;
@@ -160,8 +164,6 @@ public class Attack : Move
             body.gravityScale = _fighterRef.GetComponent<Rigidbody2D>().gravityScale;
             Vector2 v = _fighterRef.GetComponent<Rigidbody2D>().velocity;
             body.velocity = v;
-            Debug.Log("Fighter velocity: " + v);
-            Debug.Log("Attack velocity: " + body.velocity);
         }
         else if (_fighterRef.tag == "Player")
             _fighterRef.GetComponent<PlayerControllerScript>().StopMovement();
@@ -174,7 +176,6 @@ public class Attack : Move
             transform.localScale = new Vector3(1, transform.localScale.y, transform.localScale.z);
         else
             transform.localScale = new Vector3(-1, transform.localScale.y, transform.localScale.z);
-        //Debug.Log("Attack Execute: " + _attackName);
     }
 
 	void Update () 
