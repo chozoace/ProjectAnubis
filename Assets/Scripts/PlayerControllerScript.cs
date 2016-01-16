@@ -8,6 +8,7 @@ public class PlayerControllerScript : MonoBehaviour
     [SerializeField] float _jumpSpeed = 3;
     float _currentXSpeed;
     float keyboardXDir = 0;
+    int _recordedDashDirection = 1;
 
     Animator _anim;
     PlayerCombatScript _combatScript;
@@ -37,12 +38,40 @@ public class PlayerControllerScript : MonoBehaviour
         if (!_fighterRef.Attacking)
         {
             //What is held direction
-            _fighterRef.XDirection = inputDevice.LeftStickX.Value;
-            _fighterRef.YDirection = inputDevice.LeftStickY.Value;
+            int xDirection;
+            if (inputDevice.LeftStickX.Value > 0)
+                xDirection = 1;
+            else if (inputDevice.LeftStickX.Value < 0)
+                xDirection = -1;
+            else
+                xDirection = 0;
+
+            _fighterRef.XDirection = xDirection;
+            _fighterRef.YDirection = xDirection;
 
             //X Movement
             if (!inputDevice.Name.Equals("None"))
-                _currentXSpeed = (_maxSpeed * inputDevice.LeftStickX.Value);
+            {
+                //Dash Check
+                if(_currentXSpeed == 0 && xDirection != 0)
+                {
+                    if (!_fighterRef._executeDash)
+                        StartCoroutine(CheckDash(xDirection));
+                    else if(xDirection == _recordedDashDirection)
+                    {
+                        Dash(xDirection);
+                        _fighterRef._executeDash = false;
+                    }
+                    else if(xDirection != _recordedDashDirection)
+                    {
+                        _fighterRef._executeDash = false;
+                    }
+                }
+
+                //Regular movement
+                if (_fighterRef._dashing != true)
+                    _currentXSpeed = (_maxSpeed * xDirection);
+            }
             else
             {
                 if (Input.GetKeyDown(KeyCode.D))
@@ -66,10 +95,13 @@ public class PlayerControllerScript : MonoBehaviour
             //Update facing var
             if (!inputDevice.Name.Equals("None"))
             {
-                if (inputDevice.LeftStickX.Value > 0)
-                    _fighterRef.FacingRight = true;
-                else if (inputDevice.LeftStickX.Value < 0)
-                    _fighterRef.FacingRight = false;
+                if (_fighterRef._dashing == false)
+                {
+                    if (inputDevice.LeftStickX.Value > 0)
+                        _fighterRef.FacingRight = true;
+                    else if (inputDevice.LeftStickX.Value < 0)
+                        _fighterRef.FacingRight = false;
+                }
             }
             else
             {
@@ -120,6 +152,36 @@ public class PlayerControllerScript : MonoBehaviour
         }
 
 	}
+
+    void Dash(int xDirection)
+    {
+        _fighterRef._dashing = true;
+        _currentXSpeed = ((_maxSpeed + 5) * xDirection);
+
+        if (_currentXSpeed > 0)
+            _fighterRef.FacingRight = true;
+        else if (_currentXSpeed < 0)
+            _fighterRef.FacingRight = false;
+
+        StartCoroutine(EndDash());
+    }
+
+    IEnumerator EndDash()
+    {
+        yield return new WaitForSeconds(.4f);
+        _fighterRef._dashing = false;
+    }
+
+    IEnumerator CheckDash(int dashDirection)
+    {
+        if (!_fighterRef._executeDash)
+        {
+            _recordedDashDirection = dashDirection;
+            _fighterRef._executeDash = true;
+        }
+        yield return new WaitForSeconds(.2f);
+        _fighterRef._executeDash = false;
+    }
 
     public void StopMovement()
     {

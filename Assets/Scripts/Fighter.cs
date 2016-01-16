@@ -15,7 +15,7 @@ public class Fighter : MonoBehaviour
     public float YDirection { get { return _yDirection; } set { _yDirection = value; } }
 
     //Animation states
-    public enum PlayerState { Idle, Airbourne, Walking, };
+    public enum PlayerState { Idle, Airbourne, Walking, Dashing };
     PlayerState _currentState = PlayerState.Idle;
     public PlayerState GetPlayerState { get { return _currentState; } }
     //no movement or attacks are allowed during hitstunned
@@ -23,6 +23,10 @@ public class Fighter : MonoBehaviour
     public bool IsHitstunned { get { return _hitstunned; } }
     public bool _groundBounceState = false;
     public bool GroundBounceState { get { return _groundBounceState; } set { _groundBounceState = value; } }
+    //TODO: these variables shouldn't be public
+    public bool _executeDash = false;
+    public bool _dashing = false;
+
 
     bool _facingRight = true;
     public bool FacingRight { get { return _facingRight; } set { _facingRight = value; } }
@@ -70,14 +74,16 @@ public class Fighter : MonoBehaviour
                 _currentState = PlayerState.Airbourne;
             else if (Grounded && gameObject.GetComponent<Rigidbody2D>().velocity.x == 0)
                 _currentState = PlayerState.Idle;
-            else
+            else if (Grounded && gameObject.GetComponent<Rigidbody2D>().velocity.x != 0 && _dashing == false)
                 _currentState = PlayerState.Walking;
+            else if (Grounded && gameObject.GetComponent<Rigidbody2D>().velocity.x != 0 && _dashing == true)
+                _currentState = PlayerState.Dashing;
         }
 	}
 
     public void EnterGroundBounce()
     {
-        Vector2 groundBounceSpeed = new Vector2(0, 8);
+        Vector2 groundBounceSpeed = new Vector2(0, 6);
         this.gameObject.GetComponent<Rigidbody2D>().velocity = groundBounceSpeed;
     }
 
