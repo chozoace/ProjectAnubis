@@ -16,7 +16,6 @@ public class CameraScript : MonoBehaviour
         Vector3 cameraPosition = new Vector3(playerPosition.x, this.transform.position.y, -10);
         if(playerPosition.y >= 1)
         {
-            Debug.Log("playerPosition.y: " + playerPosition.y);
             cameraPosition.y = playerPosition.y - .65f;
         }
 

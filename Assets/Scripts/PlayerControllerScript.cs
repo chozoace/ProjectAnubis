@@ -5,8 +5,10 @@ using InControl;
 public class PlayerControllerScript : MonoBehaviour
 {
     [SerializeField] float _maxSpeed = 30;
+    public float MaxSpeed { get { return _maxSpeed; } }
     [SerializeField] float _jumpSpeed = 3;
     float _currentXSpeed;
+    public float CurrentXSpeed { get { return _currentXSpeed; } set { _currentXSpeed = value; } }
     float keyboardXDir = 0;
     int _recordedDashDirection = 1;
 
@@ -16,6 +18,9 @@ public class PlayerControllerScript : MonoBehaviour
     static PlayerControllerScript _instance;
     Fighter _fighterRef;
     Jump _playerJump;
+    PlayerDash _playerDash;
+    int xDirection;
+    public int getXDirection { get { return xDirection; } }
 
     public static PlayerControllerScript Instance()
     {
@@ -30,6 +35,7 @@ public class PlayerControllerScript : MonoBehaviour
         _instance = this;
         _playerJump = this.gameObject.AddComponent<Jump>();
         _playerJump.JumpSpeed = _jumpSpeed;
+        _playerDash = this.gameObject.AddComponent<PlayerDash>();
 	}
 
 	void Update () 
@@ -38,7 +44,6 @@ public class PlayerControllerScript : MonoBehaviour
         if (!_fighterRef.Attacking)
         {
             //What is held direction
-            int xDirection;
             if (inputDevice.LeftStickX.Value > 0)
                 xDirection = 1;
             else if (inputDevice.LeftStickX.Value < 0)
@@ -124,8 +129,10 @@ public class PlayerControllerScript : MonoBehaviour
                 //CHECK FOR JUMP HEIGHT, ONLY TRIGGER AT MID-HIGH HEIGHT(when speed is 0 or greater)
                 //Debug.Log("position before attack: " + transform.position);
                 //StopMovement();
-                if(gameObject.GetComponent<Rigidbody2D>().velocity.y < _jumpSpeed - 1)
+                if (gameObject.GetComponent<Rigidbody2D>().velocity.y < _jumpSpeed - 1)
+                {
                     _combatScript.StartAttack(0);
+                }
             }
             else if(inputDevice.Action4.WasPressed)
             {
@@ -136,7 +143,7 @@ public class PlayerControllerScript : MonoBehaviour
             }
             if (inputDevice.Action1.WasPressed && _fighterRef.Grounded)
             {
-                _combatScript.AddJump(_playerJump);
+                _combatScript.AddMove(_playerJump);
             }
 
         }
@@ -148,7 +155,7 @@ public class PlayerControllerScript : MonoBehaviour
                     _combatScript.StartAttack();
             }
             else if (Input.GetKeyDown(KeyCode.Space))
-                _combatScript.AddJump(_playerJump);
+                _combatScript.AddMove(_playerJump);
         }
 
 	}
@@ -156,14 +163,8 @@ public class PlayerControllerScript : MonoBehaviour
     void Dash(int xDirection)
     {
         _fighterRef._dashing = true;
-        _currentXSpeed = ((_maxSpeed + 5) * xDirection);
 
-        if (_currentXSpeed > 0)
-            _fighterRef.FacingRight = true;
-        else if (_currentXSpeed < 0)
-            _fighterRef.FacingRight = false;
-
-        StartCoroutine(EndDash());
+        _combatScript.AddMove(_playerDash);
     }
 
     IEnumerator EndDash()

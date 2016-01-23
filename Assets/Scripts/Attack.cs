@@ -35,7 +35,6 @@ public class Attack : Move
 
     public Attack CheckLinkers(int attackRank)
     {
-        //Debug.Log("In check linkers");
         Attack result = null;
         foreach(Attack linker in _linkerList)
         {
@@ -165,12 +164,13 @@ public class Attack : Move
             Vector2 v = _fighterRef.GetComponent<Rigidbody2D>().velocity;
             body.velocity = v;
         }
+        else if(_translate && fighterRef.GetComponent<PlayerControllerScript>())
+        {
+            Debug.Log("Translate");
+            fighterRef.GetComponent<PlayerDash>().ForceEndDash();
+        }
         else if (_fighterRef.tag == "Player")
             _fighterRef.GetComponent<PlayerControllerScript>().StopMovement();
-        else
-        {
-
-        }
 
         if (!_fighterRef.FacingRight)
             transform.localScale = new Vector3(1, transform.localScale.y, transform.localScale.z);

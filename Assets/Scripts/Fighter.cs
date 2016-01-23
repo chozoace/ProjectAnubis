@@ -53,7 +53,6 @@ public class Fighter : MonoBehaviour
         {
             _groundBounceState = false;
             EnterGroundBounce();
-            Debug.Log("Ground Bounce");
         }
     }
 

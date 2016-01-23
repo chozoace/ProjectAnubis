@@ -5,7 +5,8 @@ using System.Collections.Generic;
 public class Move : MonoBehaviour 
 {
     [Header("General Move Info")]
-    [SerializeField] string _moveName = "Default";
+    [SerializeField] protected string _moveName = "Default";
+    public string MoveName { get { return _moveName; } }
     [SerializeField] protected List<string> _acceptedStates;
     [SerializeField] protected char _attackInput;
     public int _attackRank;

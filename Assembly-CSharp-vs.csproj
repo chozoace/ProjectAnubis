@@ -238,6 +238,7 @@
      <Compile Include="Assets\Scripts\Move.cs" />
      <Compile Include="Assets\Scripts\PlayerCombatScript.cs" />
      <Compile Include="Assets\Scripts\PlayerControllerScript.cs" />
+     <Compile Include="Assets\Scripts\PlayerDash.cs" />
      <None Include="Assets\InControl\Readme\README.txt" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>

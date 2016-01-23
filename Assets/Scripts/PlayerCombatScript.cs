@@ -82,7 +82,8 @@ public class PlayerCombatScript : MonoBehaviour
             _currentAttack.Execute(_fighterRef, this);
             _moveListened = false;
         }
-        else if(_moveQueue[0].IsJump)
+        //else if(_moveQueue[0].IsJump)
+        else
         {
             _movePrefab = _moveQueue[0];
             _moveQueue.RemoveAt(0);
@@ -91,7 +92,7 @@ public class PlayerCombatScript : MonoBehaviour
         }
     }
 
-    public void AddJump(Move theMove)
+    public void AddMove(Move theMove)
     {
         Move performingMove = theMove;
 
@@ -136,7 +137,7 @@ public class PlayerCombatScript : MonoBehaviour
             //Debug.Log("checking list of opening");
             foreach (Attack theAttack in _openingAttacks)
             {
-                if(theAttack.ConditionsMet(_fighterRef, attackRank))
+                if (theAttack.ConditionsMet(_fighterRef, attackRank))
                 {
                     performingAttack = theAttack;
                     //break is temporary, if more than one attack meets conditions, choose by priority
