@@ -14,6 +14,8 @@ public class Attack : Move
     [SerializeField] float _yLaunchSpeed;
     [SerializeField] float _hitstunFreezeTime = 0;
     [SerializeField] float _slamSpeed = 0;
+    [SerializeField] bool _isDiveKick = false;
+    [SerializeField] float _diveSpeed = 0;
     [SerializeField] List<Attack> _linkerList;
 
     Fighter _fighterRef;
@@ -163,6 +165,12 @@ public class Attack : Move
             body.gravityScale = _fighterRef.GetComponent<Rigidbody2D>().gravityScale;
             Vector2 v = _fighterRef.GetComponent<Rigidbody2D>().velocity;
             body.velocity = v;
+            if(_isDiveKick)
+            {
+                Vector2 diveSpeed = new Vector2(4, -3);
+                body.velocity = diveSpeed;
+                fighterRef.GetComponent<Rigidbody2D>().velocity = diveSpeed;
+            }
         }
         else if(_translate && fighterRef.GetComponent<PlayerControllerScript>())
         {
@@ -193,6 +201,7 @@ public class Attack : Move
 
         if(_airAttack && _fighterRef.Grounded && !attackEndCalled)
         {
+            Debug.Log("grounded " + _fighterRef.Grounded);
             attackEndCalled = true;
             EndAttack();
         }

@@ -17,9 +17,11 @@ public class PlayerControllerScript : MonoBehaviour
     int _jumpHash = Animator.StringToHash("Jump");
     static PlayerControllerScript _instance;
     Fighter _fighterRef;
+    //make these into prefabs to modify cancel values
     Jump _playerJump;
     PlayerDash _playerDash;
     int xDirection;
+    int yDirection;
     public int getXDirection { get { return xDirection; } }
 
     public static PlayerControllerScript Instance()
@@ -50,6 +52,13 @@ public class PlayerControllerScript : MonoBehaviour
                 xDirection = -1;
             else
                 xDirection = 0;
+
+            if (inputDevice.LeftStickY.Value > 0)
+                yDirection = 1;
+            else if (inputDevice.LeftStickY.Value < 0)
+                yDirection = -1;
+            else
+                yDirection = 0;
 
             _fighterRef.XDirection = xDirection;
             _fighterRef.YDirection = xDirection;
@@ -131,7 +140,7 @@ public class PlayerControllerScript : MonoBehaviour
                 //StopMovement();
                 if (gameObject.GetComponent<Rigidbody2D>().velocity.y < _jumpSpeed - 1)
                 {
-                    _combatScript.StartAttack(0);
+                    _combatScript.StartAttack(0, xDirection, yDirection);
                 }
             }
             else if(inputDevice.Action4.WasPressed)

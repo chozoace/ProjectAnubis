@@ -111,7 +111,7 @@ public class PlayerCombatScript : MonoBehaviour
         }
     }
 
-    public void StartAttack(int attackRank = 0)
+    public void StartAttack(int attackRank = 0, float xInput = 0, float yInput = 0)
     {
         //attackRank 0 = normal attack
         //1 = Cast
@@ -137,7 +137,7 @@ public class PlayerCombatScript : MonoBehaviour
             //Debug.Log("checking list of opening");
             foreach (Attack theAttack in _openingAttacks)
             {
-                if (theAttack.ConditionsMet(_fighterRef, attackRank))
+                if (theAttack.ConditionsMet(_fighterRef, attackRank, xInput, yInput))
                 {
                     performingAttack = theAttack;
                     //break is temporary, if more than one attack meets conditions, choose by priority

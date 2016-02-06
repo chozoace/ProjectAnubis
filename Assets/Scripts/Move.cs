@@ -9,6 +9,8 @@ public class Move : MonoBehaviour
     public string MoveName { get { return _moveName; } }
     [SerializeField] protected List<string> _acceptedStates;
     [SerializeField] protected char _attackInput;
+    [SerializeField] protected int _YdirectionInput = 0;
+    [SerializeField] protected int _XdirectionInput = 0;
     public int _attackRank;
     [SerializeField] protected int _priority;
     [SerializeField] string _animationName = "Default";
@@ -48,19 +50,17 @@ public class Move : MonoBehaviour
 
     }
 
-    public virtual bool ConditionsMet(Fighter theFighter, int input)
+    public virtual bool ConditionsMet(Fighter theFighter, int input, float xInput = 0, float yInput = 0)
     {
         string currentState = theFighter.GetPlayerState.ToString();
         //checks input too
 
         foreach (string acceptedState in _acceptedStates)
         {
-            if (currentState == acceptedState)
+            if (currentState == acceptedState && input == _attackRank)
             {
-                if (input == _attackRank)
-                {
-                    return true;
-                }
+                if (yInput == _YdirectionInput && xInput == _XdirectionInput)
+                    return true;                
             }
         }
 
